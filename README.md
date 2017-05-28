@@ -54,40 +54,40 @@ Manual Data Manipulation:
 
 Example:
 
-Jan. 15
-Jan. 15
-
-Jan. 16
-Jan. 16
-
-CO-OP GROCERY TOWN
-IO
-HOME STAR DINER
-TOWN
-IO
-
-800178830919
-800129277947
-
-108.64
-44.93
+> Jan. 15
+> Jan. 15
+> 
+> Jan. 16
+> Jan. 16
+> 
+> CO-OP GROCERY TOWN
+> IO
+> HOME STAR DINER
+> TOWN
+> IO
+> 
+> 800178830919
+> 800129277947
+> 
+> 108.64
+> 44.93
 
 * If a value ends in CR, then it is a credit (remove CR, set sign to negative)
 * Values that have a comma in them should have them removed
 * Bring the Payee entries onto a single line
 
-CO-OP GROCERY TOWN IO
-HOME STAR DINER TOWN IO
+> CO-OP GROCERY TOWN IO
+> HOME STAR DINER TOWN IO
 
 Occasionally payees/reference numbers will get mixed up .. fix these
 
 Add YYYY to the end of the dates
 
-Jan. 15 2017
-Jan. 15 2017
-
-Jan. 16 2017
-Jan. 16 2017
+> Jan. 15 2017
+> Jan. 15 2017
+> 
+> Jan. 16 2017
+> Jan. 16 2017
 
 Assume:
 
@@ -124,19 +124,19 @@ Manual Data Manipulation:
 
 Example:
 
-AUG 10 AUG 11 RIVER NATURAL PARK TOWN IO
-55134426223800174862247
-$37.66
-AUG 12 AUG 15 AIRLINE 883826008065855 TOWN IO
-55503806227004023214302
-$36.75
+> AUG 10 AUG 11 RIVER NATURAL PARK TOWN IO
+> 55134426223800174862247
+> $37.66
+> AUG 12 AUG 15 AIRLINE 883826008065855 TOWN IO
+> 55503806227004023214302
+> $36.75
 
 * Change spaces to tabs
 * Add YYYY to dates
 * Occasionally, a reference number will need to be added - add any number 0000
 
-AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.66
-AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
+> AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.66
+> AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
 
 Import
 ------
