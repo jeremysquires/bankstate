@@ -148,6 +148,16 @@ AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.6
 AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
 ```
 
+Running the Script
+------------------
+
+1. Install Python 3+ (hasn't been tested with 2.x)
+2. Run
+```
+python stmt2csv.py bankstatement.txt > bankstatement.csv
+```
+3. Open CSV in LibreOffice/Excel to verify it has the correct structure
+
 Import
 ------
 
@@ -162,8 +172,20 @@ Open the file and use the CSV header column mapping feature to set, at a minimum
 
 All the other fields can be mapped to "Don't Care"
 
+TIP: There is time to be spared in MoneyManagementEX in doing the following:
+
+1. Import the CSV
+2. Delete all the imported records
+3. Tools, Organize Payees, set the Default Category for each Payee
+4. Re-import the same CSV again (with the default category set correctly)
+
 For HomeBank users: 
 
-Import resulting CSVs into MoneyManagementEX, export as QIF, then import into HomeBank as HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.  Not sure about GnuCash/GnuAccounting/Quicken/QuickBooks ...
+1. Import resulting CSVs into MoneyManagementEX (use the speedy method above)
+2. Export as QIF
+3. Import into HomeBank 
+   - HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.
+
+
 
 
