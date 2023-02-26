@@ -4,6 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pypdf = "==3.5.0"
+python-dateutil = "*"
 
 [dev-packages]
 black = "*"
@@ -12,6 +14,7 @@ pylint = "*"
 [scripts]
 format = "black *.py"
 lint = "pylint ."
+test = "python -m unittest discover -s test -v"
 
 [requires]
 python_version = "3.8"
