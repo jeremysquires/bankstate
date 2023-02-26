@@ -1,4 +1,4 @@
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 
 # creating a pdf file object
 pdfObject = open('./data/bmo_chq_eStatement_2022-11-04.pdf', 'rb')
