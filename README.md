@@ -1,10 +1,8 @@
-bankstate
-=========
+# bankstate
 
 Bank Statement Conversion for Import Into Home Finance Software
 
-Scripts
--------
+## Scripts
 
 stmt2csv.py
 
@@ -19,10 +17,9 @@ When doing a first budget, the first step is invariably to collect at least a ye
 Generated CSV files follow the following convention:
 	https://tools.ietf.org/html/rfc4180 CSV RFC
 
-Process
--------
+## Process
 
-### BMO MC Statements ###
+### BMO MC Statements
 
 Input Data Format:
 
@@ -48,9 +45,10 @@ Manual Data Manipulation:
 
 * Paste header into empty file
   - TRANSDATE POSTINGDATE PAYEE REFERENCENO AMOUNT
-* Open PDF in Evince
+* Open PDF in Evince or Okular
   - Acrobat Reader does not work because of restricted permissions to copy
 * Copy each column one at a time into a separate section in the file
+* If the file is protected by DRM, use Okular to export to text
 
 Example:
 
@@ -99,7 +97,7 @@ Assume:
 
 * Each section has the same number of values as all other sections in block
 
-### BMO Checking Statements ###
+### BMO Checking Statements
 
 Are similar to BMO MC Statements, only they only have 3 columns
 
@@ -107,7 +105,7 @@ Date Payee Amount
 
 Similar manual fixes have to be implemented and the BMO MC code should work
 
-### RBC MC Statements ###
+### RBC MC Statements
 
 * The first line of the file gives the column headers for the CSV
 * Assumes column header values do not contain tabs themselves
@@ -148,8 +146,7 @@ AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.6
 AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
 ```
 
-Running the Script
-------------------
+## Running the Script
 
 1. Install Python 3+ (hasn't been tested with 2.x)
 2. Run
@@ -158,8 +155,7 @@ python stmt2csv.py bankstatement.txt > bankstatement.csv
 ```
 3. Open CSV in LibreOffice/Excel to verify it has the correct structure
 
-Import
-------
+## Import
 
 For financial packages with flexible CSV import (MoneyManagementEX, GnuCash):
 
@@ -185,7 +181,3 @@ For HomeBank users:
 2. Export as QIF
 3. Import into HomeBank 
    - HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.
-
-
-
-
