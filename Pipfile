@@ -4,6 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+slate3k = "*"
+pypdf2 = "*"
+tabula-py = "*"
+tabulate = "*"
+ghostscript = "*"
+camelot-py = "*"
+tk = "*"
+opencv-python = "*"
+pypdf = "*"
 
 [dev-packages]
 black = "*"
