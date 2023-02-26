@@ -13,6 +13,7 @@ camelot-py = "*"
 tk = "*"
 opencv-python = "*"
 pypdf = "*"
+pymupdf = "*"
 
 [dev-packages]
 black = "*"
