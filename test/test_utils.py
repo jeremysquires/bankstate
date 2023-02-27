@@ -29,6 +29,7 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(utils.is_transaction_line("Jan 05 blah blah"))
         self.assertFalse(utils.is_date("Gak 05 blah blah"))
 
+# TODO: unit test is_currency, is_float, is_int and currency_to_float
 
 if __name__ == '__main__':
     unittest.main()

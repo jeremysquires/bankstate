@@ -56,3 +56,5 @@ def is_int(string):
 def is_currency(string):
     # remove thousands separators and $ from currency, then check float
     return is_float(string.replace(",", "").replace("$", ""))
+
+# TODO: currency_to_float()
