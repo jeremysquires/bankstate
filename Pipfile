@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pypdf = "==3.5.0"
 python-dateutil = "*"
+pymupdf = "*"
 
 [dev-packages]
 black = "*"
