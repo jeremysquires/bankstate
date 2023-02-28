@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 from pypdf import PdfReader
 from typing import List, Tuple
 import fitz
@@ -70,13 +71,15 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     initial_balance = 0.0
     current_balance = 0.0
     parts = []
+    year = str(datetime.now().year)
     for text_line in text_lines:
-        # TODO: find year and append to date
+        if "For the period ending" in text_line:
+            year = text_line[-4:]
         text_line = text_line.replace("\t", " ")
         if utils.is_mon_dd_date(text_line):
             in_rollup = True
             field_number = 0
-            roll_up = text_line
+            roll_up = f"{text_line}, {year}"
         elif in_rollup:
             field_number += 1
             roll_up = f"{roll_up}\t{text_line}"
@@ -119,8 +122,10 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     epsilon = 0.01
     parts = []
     days_entries = []
+    year = str(datetime.now().year)
     for text_line in text_lines:
-        # TODO: find year and append to date
+        if "Your opening balance on" in text_line:
+            year = text_line[-4:]
         text_line = text_line.replace("\t", " ")
         if text_line == "Opening Balance":
             in_balance = True
@@ -134,7 +139,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             roll_up = ""
             days_entries = []
-            current_date = text_line
+            current_date = f"{text_line}, {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -170,7 +175,6 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                         parts.insert(3, "")
                     day_entry = "\t".join(parts)
                     roll_up_lines.append(day_entry)
-                    # TODO: sanity check the final balance below, flag an error if mismatch
                     days_entries = []
                 roll_up = f"{roll_up}\t{text_line}"
                 in_rollup = False
@@ -204,15 +208,19 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     roll_up = ""
     in_rollup = False
     field_number = 0
+    year = str(datetime.now().year)
     for text_line in text_lines:
-        # TODO: find year and append to date
+        if "Previous Balance" in text_line:
+            year = text_line[-4:]
+        elif "STATEMENT FROM" in text_line:
+            year = text_line[-4:]
         text_line = text_line.replace("\t", " ")
         if not in_rollup and (
             utils.is_mon_dot_dd_date(text_line) or utils.is_mon_dd_date(text_line)
         ):
             in_rollup = True
             field_number = 0
-            roll_up = text_line.replace(".", "")
+            roll_up = f'{text_line.replace(".", "")}, {year}'
         elif in_rollup:
             field_number += 1
             if field_number == 1:
