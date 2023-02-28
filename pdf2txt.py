@@ -80,11 +80,13 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
         elif in_rollup:
             field_number += 1
             roll_up = f"{roll_up}\t{text_line}"
-        if "balance" in roll_up and field_number == 2:
+        if "Opening balance" in roll_up and field_number == 2:
             in_rollup = False
             parts = roll_up.split("\t")
             initial_balance = float(parts[2].replace(",", ""))
-        if field_number == 3:
+        elif "Closing totals" in roll_up and field_number == 2:
+            in_rollup = False
+        elif field_number == 3 and in_rollup:
             in_rollup = False
             parts = roll_up.split("\t")
             current_balance = float(parts[3].replace(",", ""))
