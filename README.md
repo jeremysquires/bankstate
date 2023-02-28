@@ -2,7 +2,7 @@
 
 Bank Statement Conversion for Import Into Home Finance Software
 
-When doing a first budget, the first step is invariably to collect at least a year's worth of data to form a reliable basis for the budget. Unfortunately, few banking institutions provide more than a few months of data in any of the download formats supported by home finance software. The first time budgeter is forced to download PDF statements from their accounts and somehow convert them for import into their home finance software. At least one of the commercial finance packages provide OCR of scanned statements (Quicken), but none of the free ones that I checked (HomeBank, GnuCash, MoneyManagementEX). In any case, the PDF files allow extraction of the text data without having to OCR them, so this is the preffered method.
+When doing a budget, the first step is invariably to collect at least a year's worth of data to form a reliable basis for the budget. Unfortunately, few banking institutions provide more than a few months of data in any of the download formats supported by home finance software. The first time budgeter is forced to download PDF statements from their accounts and somehow convert them for import into their home finance software. At least one of the commercial finance packages provide OCR of scanned statements (Quicken), but none of the free ones that I checked (HomeBank, GnuCash, MoneyManagementEX). In any case, the PDF files allow extraction of the text data without having to OCR them, so this is the preffered method.
 
 ## License
 
@@ -44,7 +44,8 @@ Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> an
 * cd bankstate
 * pipenv install --dev
 * pipenv shell
-* python pdf2csv.py filename.pdf [bmo_bank|bmo_mc|rbc_bank|rbc_mc] output.tsv
+* python pdf2csv.py filename.pdf filetype output.tsv
+  * Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
 * Open TSV in LibreOffice/Excel to verify it has the correct structure
 * Import Into Budgeting Software
 

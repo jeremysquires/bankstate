@@ -17,14 +17,14 @@ def get_run_params() -> Tuple[str, str, str]:
     )
     parser.add_argument(
         "filetype",
-        choices=["bmo_bank", "bmo_mc", "rbc_bank", "rbc_mc"],
+        choices=["bmo_bank", "bmo_card", "rbc_bank", "rbc_card"],
         default="bmo_bank",
         help=(
             f"is the type of input bank statement: "
             f"bmo is the Bank of Montreal, "
             f"rbc is the Royal Bank of Canada, "
             f"_bank is a bank current account statement, and "
-            f"_mc is a MasterCard statement"
+            f"_card is a MasterCard statement"
         ),
     )
     parser.add_argument("output", help=f"output is the path to the CSV/TSV output file")
@@ -197,7 +197,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     return roll_up_lines
 
 
-def roll_up_mc_transactions(text_lines: List[str]) -> List[str]:
+def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     roll_up_lines = ["Date\tDescription\tDebit\tCredit"]
     roll_up = ""
     in_rollup = False
@@ -256,17 +256,17 @@ if filetype == "bmo_bank":
     # checking
     raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
-elif filetype == "bmo_mc":
+elif filetype == "bmo_card":
     # master card
     raw_text_lines = get_raw_text_lines_mupdf(filename)
-    transaction_lines = roll_up_mc_transactions(raw_text_lines)
+    transaction_lines = roll_up_card_transactions(raw_text_lines)
 elif filetype == "rbc_bank":
     # checking
     raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
-elif filetype == "rbc_mc":
+elif filetype == "rbc_card":
     # master card
     raw_text_lines = get_raw_text_lines_mupdf(filename)
-    transaction_lines = roll_up_mc_transactions(raw_text_lines)
+    transaction_lines = roll_up_card_transactions(raw_text_lines)
 
 output_lines(transaction_lines, output)
