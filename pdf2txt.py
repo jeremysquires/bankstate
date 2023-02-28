@@ -20,6 +20,15 @@ def get_filename() -> str:
     return filename, filetype
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
+    '''
+    get_raw_text_lines_pypdf returns single lines per transaction
+    raw_text_lines = get_raw_text_lines_pypdf(filename)
+    transaction_lines = filter(utils.is_transaction_line, raw_text_lines)
+    Numbers are preceded by slash, special chars are encoded
+    /2c = , - /2e = . - etc.
+    Nov /0/6 Opening balance /2/2c/0/0/0/2e/0/0
+    Nov /0/8 Online Bill Payment/2c HEAT /2/0/0/2e/0/0 /2/2c/1/2e/8/0/0/2e/0/0
+    '''
     pdfObject = open(filename, 'rb')
     pdfReader = PdfReader(pdfObject)
     text_lines=[]
@@ -46,6 +55,7 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     current_balance = 0.0
     parts = []
     for text_line in text_lines:
+        # TODO: find year and append to date
         text_line = text_line.replace('\t',' ')
         if (utils.is_mon_dd_date(text_line)):
             in_rollup = True
@@ -91,6 +101,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     parts = []
     days_entries = []
     for text_line in text_lines:
+        # TODO: find year and append to date
         text_line = text_line.replace('\t',' ')
         if (text_line == "Opening Balance"):
             in_balance = True
@@ -170,6 +181,7 @@ def roll_up_mc_transactions(text_lines: List[str]) -> List[str]:
     in_rollup = False
     field_number = 0
     for text_line in text_lines:
+        # TODO: find year and append to date
         text_line = text_line.replace('\t', ' ')
         if (not in_rollup and (utils.is_mon_dot_dd_date(text_line) or utils.is_mon_dd_date(text_line))):
             in_rollup = True
@@ -210,6 +222,7 @@ def output_lines(transaction_lines: List[str]) -> None:
     for line in transaction_lines:
         print(line)
 
+# __main__: starts here
 filename, filetype = get_filename()
 transaction_lines = []
 if filetype == "bmo_bank":
@@ -229,15 +242,4 @@ elif filetype == "rbc_mc":
     raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_mc_transactions(raw_text_lines)
 
-# pypdf option returns single lines per transaction
-# raw_text_lines = get_raw_text_lines_pypdf(filename)
-# transaction_lines = filter(utils.is_transaction_line, raw_text_lines)
 output_lines(transaction_lines)
-
-
-'''
-Numbers are preceded by slash, special chars are encoded
-/2c = , - /2e = . - etc.
-Nov /0/6 Opening balance /2/2c/0/0/0/2e/0/0
-Nov /0/8 Online Bill Payment/2c HEAT /2/0/0/2e/0/0 /2/2c/1/2e/8/0/0/2e/0/0
-'''
