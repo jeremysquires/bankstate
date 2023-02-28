@@ -1,24 +1,36 @@
+import argparse
 from pypdf import PdfReader
-from typing import List
+from typing import List, Tuple
 import fitz
 import utils
 
 
-# TODO: read commmand line file name
-def get_filename() -> str:
-    # filename = "./test/data/bmo_chq_eStatement_2022-11-04.pdf"
-    # filetype = "bmo_bank"
-    # filename = "./test/data/bmo_mc_eStatement_2022-07-15.pdf"
-    # filetype = "bmo_mc"
-    # filename = "./test/data/bmo_mc_eStatement_2022-01-15.pdf"
-    # filetype = "bmo_mc"
-    # filename = "./test/data/rbc_Chequing Statement-9167 2022-07-20.pdf"
-    # filetype = "rbc_bank"
-    # filename = "./test/data/rbc_MasterCard Statement-2480 2022-06-09.pdf"
-    # filetype = "rbc_mc"
-    filename = "./test/data/rbc_Chequing Statement-9167 2022-09-20.pdf"
-    filetype = "rbc_bank"
-    return filename, filetype
+def get_run_params() -> Tuple[str, str, str]:
+    parser = argparse.ArgumentParser(
+        prog="pdf2txt.py",
+        description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
+        epilog= f"Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net> "
+                f"License: <https://opensource.org/licenses/MIT>",
+    )
+    parser.add_argument(
+        "filename", help="filename is the path to a PDF bank eStatement"
+    )
+    parser.add_argument(
+        "filetype",
+        choices=["bmo_bank", "bmo_mc", "rbc_bank", "rbc_mc"],
+        default="bmo_bank",
+        help=(
+            f"is the type of input bank statement: "
+            f"bmo is the Bank of Montreal, "
+            f"rbc is the Royal Bank of Canada, "
+            f"_bank is a bank current account statement, and "
+            f"_mc is a MasterCard statement"
+        ),
+    )
+    parser.add_argument("output", help=f"output is the path to the CSV/TSV output file")
+    args = parser.parse_args()
+    print(args.filename, args.filetype, args.output)
+    return args.filename, args.filetype, args.output
 
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
@@ -231,13 +243,14 @@ def roll_up_mc_transactions(text_lines: List[str]) -> List[str]:
     return roll_up_lines
 
 
-def output_lines(transaction_lines: List[str]) -> None:
-    for line in transaction_lines:
-        print(line)
+def output_lines(transaction_lines: List[str], output: str) -> None:
+    with open(output, "w") as output_file:
+        for line in transaction_lines:
+            output_file.write(f"{line}\n")
 
 
 # __main__: starts here
-filename, filetype = get_filename()
+filename, filetype, output = get_run_params()
 transaction_lines = []
 if filetype == "bmo_bank":
     # checking
@@ -256,4 +269,4 @@ elif filetype == "rbc_mc":
     raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_mc_transactions(raw_text_lines)
 
-output_lines(transaction_lines)
+output_lines(transaction_lines, output)
