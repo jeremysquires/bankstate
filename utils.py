@@ -57,4 +57,9 @@ def is_currency(string):
     # remove thousands separators and $ from currency, then check float
     return is_float(string.replace(",", "").replace("$", ""))
 
-# TODO: currency_to_float()
+def currency_to_float(string):
+    # remove thousands separators and $ from currency
+    # return None if input is not currency
+    if not is_currency(string):
+        return None
+    return string.replace(",", "").replace("$", "")
