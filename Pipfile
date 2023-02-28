@@ -16,6 +16,10 @@ pylint = "*"
 format = "black *.py"
 lint = "pylint ."
 test = "python -m unittest discover -s test -v"
+test_bmo_bank = "python pdf2csv.py ./test/data/bmo_bank.pdf bmo_bank ./test/data/bmo_bank.tsv"
+test_bmo_card = "python pdf2csv.py ./test/data/bmo_card.pdf bmo_card ./test/data/bmo_card.tsv"
+test_rbc_bank = "python pdf2csv.py ./test/data/rbc_bank.pdf rbc_bank ./test/data/rbc_bank.tsv"
+test_rbc_card = "python pdf2csv.py ./test/data/bmo_card.pdf bmo_card ./test/data/bmo_card.tsv"
 
 [requires]
 python_version = "3.8"
