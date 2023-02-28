@@ -1,6 +1,7 @@
 from datetime import datetime
 from dateutil.parser import parse
 
+
 def is_date(string, fuzzy=False):
     """
     Return whether the string can be interpreted as a date.
@@ -8,11 +9,12 @@ def is_date(string, fuzzy=False):
     :param string: str, string to check for date
     :param fuzzy: bool, ignore unknown tokens in string if True
     """
-    try: 
+    try:
         parse(string, fuzzy=fuzzy)
         return True
     except ValueError:
         return False
+
 
 def is_format_date(string, format):
     try:
@@ -21,14 +23,18 @@ def is_format_date(string, format):
     except ValueError:
         return False
 
+
 def is_mon_dd_date(string):
     return is_format_date(string, "%b %d")
+
 
 def is_dd_mon_date(string):
     return is_format_date(string, "%d %b")
 
+
 def is_mon_dot_dd_date(string):
     return is_format_date(string, "%b. %d")
+
 
 def is_transaction_line(string):
     # starts with three letter month and day
@@ -36,15 +42,17 @@ def is_transaction_line(string):
         return False
     return True
 
+
 def is_float(string):
     try:
         float(string)
-        if ("." in string):
+        if "." in string:
             return True
         else:
             return False
     except ValueError:
         return False
+
 
 def is_int(string):
     try:
@@ -53,9 +61,11 @@ def is_int(string):
     except ValueError:
         return False
 
+
 def is_currency(string):
     # remove thousands separators and $ from currency, then check float
     return is_float(string.replace(",", "").replace("$", ""))
+
 
 def currency_to_float(string):
     # remove thousands separators and $ from currency
