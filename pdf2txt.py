@@ -63,7 +63,7 @@ def get_raw_text_lines_mupdf(filename: str) -> List[str]:
 
 
 def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
-    roll_up_lines = ["Date\tDescription\tDebit\tCredit\tBalance"]
+    roll_up_lines = ["Date\tDescription\tWithdrawal\tDeposit\tBalance"]
     roll_up = ""
     in_rollup = False
     field_number = 0
@@ -105,7 +105,7 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
 
 
 def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
-    roll_up_lines = ["Date\tDescription\tDebit\tCredit\tBalance"]
+    roll_up_lines = ["Date\tDescription\tWithdrawal\tDeposit\tBalance"]
     roll_up = ""
     in_rollup = False
     in_balance = False
@@ -198,7 +198,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
 
 
 def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
-    roll_up_lines = ["Date\tDescription\tDebit\tCredit"]
+    roll_up_lines = ["Date\tDescription\tWithdrawal\tDeposit"]
     roll_up = ""
     in_rollup = False
     field_number = 0
