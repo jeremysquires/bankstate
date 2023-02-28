@@ -12,7 +12,7 @@ License: <https://opensource.org/licenses/MIT>
 
 ## Scripts
 
-pdf2csv.py
+pdf2txt.py
 
 Reads PDF bank and mastercard statements and directly outputs a CSV format that can be imported into home finance software
 
@@ -27,11 +27,11 @@ Converts text copied from PDF bank statements into a CSV or TSV format that can 
 
 Input to the stmt2csv.py script is manually copy/pasted from PDF files, so it is technically possible to create the input files from any source.
 
-Since pdf2csv.py reads the PDF directly, it is the preferred method, requiring less manual intervention. However, in cases where the format of the PDFs change or are sourced from other banks, the manual copy method can still be used.
+Since pdf2txt.py reads the PDF directly, it is the preferred method, requiring less manual intervention. However, in cases where the format of the PDFs change or are sourced from other banks, the manual copy method can still be used.
 
 Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> and contain columns that in general match the input files, but with some cleanups to make import easier. Generated TSV files replace commas for tabs, which is useful when fields often contain commas.
 
-## pdf2csv.py
+## pdf2txt.py
 
 ### Requirements
 
@@ -44,7 +44,7 @@ Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> an
 * cd bankstate
 * pipenv install --dev
 * pipenv shell
-* python pdf2csv.py filename.pdf filetype output.tsv
+* python pdf2txt.py filename.pdf filetype output.tsv
   * Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
 * Open TSV in LibreOffice/Excel to verify it has the correct structure
 * Import Into Budgeting Software
