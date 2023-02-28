@@ -2,31 +2,113 @@
 
 Bank Statement Conversion for Import Into Home Finance Software
 
+When doing a first budget, the first step is invariably to collect at least a year's worth of data to form a reliable basis for the budget. Unfortunately, few banking institutions provide more than a few months of data in any of the download formats supported by home finance software. The first time budgeter is forced to download PDF statements from their accounts and somehow convert them for import into their home finance software. At least one of the commercial finance packages provide OCR of scanned statements (Quicken), but none of the free ones that I checked (HomeBank, GnuCash, MoneyManagementEX). In any case, the PDF files allow extraction of the text data without having to OCR them, so this is the preffered method.
+
+## License
+
+Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net>
+
+License: <https://opensource.org/licenses/MIT>
+
 ## Scripts
+
+pdf2csv.py
+
+Reads PDF bank and mastercard statements and directly outputs a CSV format that can be imported into home finance software
 
 stmt2csv.py
 
-Converts text copied from bank statements in PDF format into a CSV format that can be imported into home finance software
+Converts text copied from PDF bank statements into a CSV or TSV format that can be imported into home finance software
 
-Copyright (C) 2017 Jeremy Squires <jms@mailforce.net>
+## Supported Data Formats
 
-License: https://opensource.org/licenses/MIT
+* Bank of Montreal (BMO) bank account and credit card statements in PDF format
+* Royal Bank of Canada (RBC) bank account and credit card statements in PDF format
 
-When doing a first budget, the first step is invariably to collect at least a year's worth of data to form a reliable basis for the budget.  Unfortunately, few banking institutions provide more than a few months of data in any of the download formats supported by home finance software.  The first time budgeter is forced to download PDF statements from their accounts and somehow convert them for import into their home finance software.  At least one of the commercial finance packages provide OCR of scanned statements (Quicken), but none of the free ones that I checked (HomeBank, GnuCash, MoneyManagementEX).  In any case, the PDF files allow extraction of the text data without having to OCR them, so this is the preffered method.  The data that is copy/pasted from PDFs is not in any format that can be imported, so this is what this software provides.
+Input to the stmt2csv.py script is manually copy/pasted from PDF files, so it is technically possible to create the input files from any source.
 
-Generated CSV files follow the following convention:
-	https://tools.ietf.org/html/rfc4180 CSV RFC
+Since pdf2csv.py reads the PDF directly, it is the preferred method, requiring less manual intervention. However, in cases where the format of the PDFs change or are sourced from other banks, the manual copy method can still be used.
 
-## Process
+Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> and contain columns that in general match the input files, but with some cleanups to make import easier. Generated TSV files replace commas for tabs, which is useful when fields often contain commas.
 
-### BMO MC Statements
+## pdf2csv.py
+
+### Requirements
+
+* Python 3.8
+* pipenv
+
+### Process
+
+* git clone git@github.com:jeremysquires/bankstate.git
+* cd bankstate
+* pipenv install --dev
+* pipenv shell
+* python pdf2csv.py filename.pdf [bmo_bank|bmo_mc|rbc_bank|rbc_mc] output.tsv
+* Open TSV in LibreOffice/Excel to verify it has the correct structure
+* Import Into Budgeting Software
+
+## Import Into Budgeting Software
+
+For financial packages with flexible CSV/TSV import (MoneyManagementEX, GnuCash):
+
+Open the file and use the header column mapping feature to set, at a minimum, maps of the following columns to corresponding columns in the software.
+
+### Credit Cards
+
+* Date
+* Payee
+* Amount (+/-)
+
+### Checking
+
+* Date
+* Payee
+* Deposit
+* Withdrawal
+
+All the other fields can be mapped to "Don't Care"
+
+TIP: There is time to be spared in MoneyManagementEX in doing the following:
+
+1. Import the CSV/TSV
+2. Delete all the imported records
+3. Tools, Organize Payees, set the Default Category for each Payee
+4. Re-import the same CSV/TSV again (with the default category set correctly)
+
+For HomeBank users:
+
+1. Import resulting CSV/TSV into MoneyManagementEX (use the speedy method above)
+2. Export as QIF
+3. Import into HomeBank
+   * HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.
+
+## stmt2csv.py
+
+### Requirements
+
+* Python 3.8
+* pipenv
+
+### Process
+
+* git clone git@github.com:jeremysquires/bankstate.git
+* cd bankstate
+* pipenv install --dev
+* pipenv shell
+* Prepare input text using the correct `Text Copy` procedure
+* python stmt2csv.py bankstatement.txt > output.csv
+* Open CSV in LibreOffice/Excel to verify it has the correct structure
+* Import Into Budgeting Software
+
+### BMO MC Statement Text Copy
 
 Input Data Format:
 
 * The first line of the file gives the column headers for the CSV
 * ASSUMES column header values do not contain spaces themselves
 * Blank lines separate sections
-  - EXCEPT no blank line between the header and the first section
+  * EXCEPT no blank line between the header and the first section
 * Each section corresponds to one column in the target CSV
 * A group of sections corresponding to the column headers is called a block
 * Credit card entries reverse the sign for amounts, credits are negative
@@ -44,13 +126,13 @@ Algorithm:
 Manual Data Manipulation:
 
 * Paste header into empty file
-  - TRANSDATE POSTINGDATE PAYEE REFERENCENO AMOUNT
+  * TRANSDATE POSTINGDATE PAYEE REFERENCENO AMOUNT
 * Open PDF in Evince or Okular
-  - Acrobat Reader does not work because of restricted permissions to copy
+  * Acrobat Reader does not work because of restricted permissions to copy
 * Copy each column one at a time into a separate section in the file
 * If the file is protected by DRM, use Okular to export to text
 
-Example:
+Example copied text:
 
 ```
 Jan. 15
@@ -97,7 +179,7 @@ Assume:
 
 * Each section has the same number of values as all other sections in block
 
-### BMO Checking Statements
+### BMO Checking Statement Text Copy
 
 Are similar to BMO MC Statements, only they only have 3 columns
 
@@ -105,7 +187,7 @@ Date Payee Amount
 
 Similar manual fixes have to be implemented and the BMO MC code should work
 
-### RBC MC Statements
+### RBC MC Statement Text Copy
 
 * The first line of the file gives the column headers for the CSV
 * Assumes column header values do not contain tabs themselves
@@ -123,7 +205,7 @@ Manual Data Manipulation:
 
 * Use Adobe Acrobat Reader
 * Paste header into empty file (note tab separation)
-  - TRANSDATE	POSTINGDATE	PAYEE	REFERENCENO	AMOUNT
+  * TRANSDATE	POSTINGDATE	PAYEE	REFERENCENO	AMOUNT
 * Copy all lines in a block of text into the file
 
 Example:
@@ -145,39 +227,3 @@ $36.75
 AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.66
 AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
 ```
-
-## Running the Script
-
-1. Install Python 3+ (hasn't been tested with 2.x)
-2. Run
-```
-python stmt2csv.py bankstatement.txt > bankstatement.csv
-```
-3. Open CSV in LibreOffice/Excel to verify it has the correct structure
-
-## Import
-
-For financial packages with flexible CSV import (MoneyManagementEX, GnuCash):
-
-Open the file and use the CSV header column mapping feature to set, at a minimum, map the following columns:
-
-* Date
-* Payee
-* Amount
-  - Some statements have Deposit and Withdrawal instead of Amount
-
-All the other fields can be mapped to "Don't Care"
-
-TIP: There is time to be spared in MoneyManagementEX in doing the following:
-
-1. Import the CSV
-2. Delete all the imported records
-3. Tools, Organize Payees, set the Default Category for each Payee
-4. Re-import the same CSV again (with the default category set correctly)
-
-For HomeBank users: 
-
-1. Import resulting CSVs into MoneyManagementEX (use the speedy method above)
-2. Export as QIF
-3. Import into HomeBank 
-   - HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.
