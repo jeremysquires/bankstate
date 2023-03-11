@@ -24,6 +24,11 @@ def is_format_date(string, format):
         return False
 
 
+def dd_mon_to_mon_dd_date(string):
+    date_part = string.split(" ")
+    return f"{date_part[1]} {date_part[0]}"
+
+
 def is_mon_dd_date(string):
     return is_format_date(string, "%b %d")
 

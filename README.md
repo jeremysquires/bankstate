@@ -65,8 +65,8 @@ Open the file and use the header column mapping feature to set, at a minimum, ma
 
 * Date
 * Payee
-* Deposit
 * Withdrawal
+* Deposit
 
 All the other fields can be mapped to "Don't Care"
 

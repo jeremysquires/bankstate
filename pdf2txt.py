@@ -79,7 +79,8 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
         if utils.is_mon_dd_date(text_line):
             in_rollup = True
             field_number = 0
-            roll_up = f"{text_line}, {year}"
+            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
+            roll_up = f"{mon_dd} {year}"
         elif in_rollup:
             field_number += 1
             roll_up = f"{roll_up}\t{text_line}"
@@ -139,7 +140,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             roll_up = ""
             days_entries = []
-            current_date = f"{text_line}, {year}"
+            current_date = f"{text_line} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -220,7 +221,9 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
         ):
             in_rollup = True
             field_number = 0
-            roll_up = f'{text_line.replace(".", "")}, {year}'
+            text_line = text_line.replace(".", "")
+            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
+            roll_up = f"{mon_dd} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
