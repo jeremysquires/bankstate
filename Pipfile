@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pypdf = "==3.5.0"
+python-dateutil = "*"
+pymupdf = "*"
 
 [dev-packages]
 black = "*"
@@ -12,6 +15,13 @@ pylint = "*"
 [scripts]
 format = "black *.py"
 lint = "pylint ."
+test = "python -m unittest discover -s test -v"
+test_bmo_bank = "python pdf2txt.py ./test/data/bmo_bank.pdf bmo_bank ./test/data/bmo_bank.tsv"
+test_bmo_card = "python pdf2txt.py ./test/data/bmo_card.pdf bmo_card ./test/data/bmo_card.tsv"
+test_bmo_card2 = "python pdf2txt.py ./test/data/bmo_card2.pdf bmo_card ./test/data/bmo_card2.tsv"
+test_rbc_bank = "python pdf2txt.py ./test/data/rbc_bank.pdf rbc_bank ./test/data/rbc_bank.tsv"
+test_rbc_bank2 = "python pdf2txt.py ./test/data/rbc_bank2.pdf rbc_bank ./test/data/rbc_bank2.tsv"
+test_rbc_card = "python pdf2txt.py ./test/data/bmo_card.pdf bmo_card ./test/data/bmo_card.tsv"
 
 [requires]
 python_version = "3.8"
