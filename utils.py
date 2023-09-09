@@ -1,5 +1,8 @@
 from datetime import datetime
 from dateutil.parser import parse
+from typing import List
+
+MAX_FIELD_LENGTH = 128
 
 
 def is_date(string, fuzzy=False):
@@ -78,3 +81,10 @@ def currency_to_float(string):
     if not is_currency(string):
         return None
     return string.replace(",", "").replace("$", "")
+
+
+def trim_parts(parts: List[str]) -> List[str]:
+    return [
+        part if len(part) < MAX_FIELD_LENGTH else " ".join(part.split(" ")[-2:])
+        for part in parts
+    ]
