@@ -10,8 +10,8 @@ def get_run_params() -> Tuple[str, str, str]:
     parser = argparse.ArgumentParser(
         prog="pdf2txt.py",
         description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
-        epilog= f"Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net> "
-                f"License: <https://opensource.org/licenses/MIT>",
+        epilog=f"Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net> "
+        f"License: <https://opensource.org/licenses/MIT>",
     )
     parser.add_argument(
         "filename", help="filename is the path to a PDF bank eStatement"
@@ -174,8 +174,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                         # all others are assumed withdrawals
                         partial_balance -= float(parts[2].replace(",", ""))
                         parts.insert(3, "")
-                    day_entry = "\t".join(parts)
-                    roll_up_lines.append(day_entry)
+                    roll_up_lines.append("\t".join(utils.trim_parts(parts)))
                     days_entries = []
                 roll_up = f"{roll_up}\t{text_line}"
                 in_rollup = False
@@ -192,8 +191,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                 final_balance = initial_balance + partial_balance
                 if abs(current_balance - final_balance) > epsilon:
                     parts[1] += " ERR:BALANCE"
-                roll_up = "\t".join(parts)
-                roll_up_lines.append(roll_up)
+                roll_up_lines.append("\t".join(utils.trim_parts(parts)))
                 # transaction field reset
                 initial_balance = current_balance
                 partial_balance = 0.0

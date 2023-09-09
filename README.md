@@ -228,3 +228,42 @@ $36.75
 AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.66
 AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
 ```
+
+## Tests
+
+There are unit tests for the utils that can be run with `pipenv run test`.
+Testing the handlers requires some PDF data samples.
+Once the PDF Data Samples are set up, you can run `pipenv run test_<statement_type>`.
+See Pipfile for the list of tests available under the `scripts` section.
+
+### PDF Data Samples
+
+In the `test/data` folder, add the following PDF files from samples you download (they won't be added to the repo because of a .gitignore on the `test/data` folder):
+
+* bmo_bank.pdf
+* bmo_card.pdf
+* bmo_card2.pdf
+* rbc_bank.pdf
+* rbc_bank2.pdf
+* rbc_bank_2023.pdf
+* rbc_card.pdf
+
+### Automate Tests
+
+If you have a `bash` interpreter installed, you can run the tests and comparisons all in one.
+
+* `cd test`
+* `bash test_handlers.sh`
+
+The `test/data/orig` and `test/data/new` folders will be created by the `test_handlers.sh` script.
+The first time it runs it will populate the `orig` folder with the `.tsv` files.
+Every subsequent run, the `new` folder will be populated and compared with the `orig` using `diff`.
+
+## Debug
+
+The debug setup uses VSCode.
+Debug scenarios are set up in `.vscode/launch.json`
+In VSCode, open the `Run and Debug` side panel (the bug and triangle icon)
+Open the `pdf2txt.py` python script in an editor window.
+Pull down the dropdown to the right of the Green Debug triangle at the top of the panel.
+Select the test you want to debug.
