@@ -61,11 +61,11 @@
         },
         "pypdf": {
             "hashes": [
-                "sha256:81cf6e8a206450726555023a36c13fb40f680c047b8fcc0bcbfd4d1908c33d31",
-                "sha256:8e003c4ee4875450612c2571ba9a5cc12d63a46b226a484314b21b7f013d2717"
+                "sha256:71fd274f5e02c7122f688f5b2609407d5dd92ecb4140d498108fc94ea9573800",
+                "sha256:887bf97029d9317a1a48da71c3fae7d6fab905a8b2e82999004e9d1385616a6a"
             ],
             "index": "pypi",
-            "version": "==3.15.5"
+            "version": "==3.16.0"
         },
         "python-dateutil": {
             "hashes": [
@@ -136,14 +136,6 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==8.1.7"
-        },
-        "colorama": {
-            "hashes": [
-                "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44",
-                "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
-            ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==0.4.6"
         },
         "dill": {
             "hashes": [
