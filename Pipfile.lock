@@ -45,6 +45,7 @@
                 "sha256:f9a1d2f7484bde2ec81f3c88641f7a8b7f52450b807408ae7a340ddecb424659"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.8'",
             "version": "==1.23.3"
         },
         "pymupdfb": {
@@ -61,11 +62,12 @@
         },
         "pypdf": {
             "hashes": [
-                "sha256:81cf6e8a206450726555023a36c13fb40f680c047b8fcc0bcbfd4d1908c33d31",
-                "sha256:8e003c4ee4875450612c2571ba9a5cc12d63a46b226a484314b21b7f013d2717"
+                "sha256:7fc9eac57162c1c4651ffae1ae96dee911d8e75af66e83b2453b2a553a8814cc",
+                "sha256:aff9540e6c5ec135d6e80943db74257523639325162d00c903ee1e2be84351fc"
             ],
             "index": "pypi",
-            "version": "==3.15.5"
+            "markers": "python_version >= '3.6'",
+            "version": "==3.16.1"
         },
         "python-dateutil": {
             "hashes": [
@@ -73,6 +75,7 @@
                 "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"
             ],
             "index": "pypi",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.8.2"
         },
         "six": {
@@ -85,21 +88,21 @@
         },
         "typing-extensions": {
             "hashes": [
-                "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36",
-                "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"
+                "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0",
+                "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"
             ],
             "markers": "python_version < '3.10'",
-            "version": "==4.7.1"
+            "version": "==4.8.0"
         }
     },
     "develop": {
         "astroid": {
             "hashes": [
-                "sha256:389656ca57b6108f939cf5d2f9a2a825a3be50ba9d589670f393236e0a03b91c",
-                "sha256:903f024859b7c7687d7a7f3a3f73b17301f8e42dfd9cc9df9d4418172d3e2dbd"
+                "sha256:958f280532e36ca84a13023f15cb1556fb6792d193acb87e1f3ca536b6fa6bd2",
+                "sha256:c522f2832a900e27a7d284b9b6ef670d2495f760ede3c8c0b004a5641d3c5987"
             ],
             "markers": "python_full_version >= '3.7.2'",
-            "version": "==2.15.6"
+            "version": "==2.15.7"
         },
         "black": {
             "hashes": [
@@ -127,6 +130,7 @@
                 "sha256:fb074d8b213749fa1d077d630db0d5f8cc3b2ae63587ad4116e8a436e9bbe995"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.8'",
             "version": "==23.7.0"
         },
         "click": {
@@ -136,14 +140,6 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==8.1.7"
-        },
-        "colorama": {
-            "hashes": [
-                "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44",
-                "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
-            ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==0.4.6"
         },
         "dill": {
             "hashes": [
@@ -249,6 +245,7 @@
                 "sha256:f7b601cbc06fef7e62a754e2b41294c2aa31f1cb659624b9a85bcba29eaf8252"
             ],
             "index": "pypi",
+            "markers": "python_full_version >= '3.7.2'",
             "version": "==2.17.5"
         },
         "tomli": {
@@ -269,11 +266,11 @@
         },
         "typing-extensions": {
             "hashes": [
-                "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36",
-                "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"
+                "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0",
+                "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"
             ],
             "markers": "python_version < '3.10'",
-            "version": "==4.7.1"
+            "version": "==4.8.0"
         },
         "wrapt": {
             "hashes": [
