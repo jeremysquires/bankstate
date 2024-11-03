@@ -68,12 +68,12 @@
         },
         "pypdf": {
             "hashes": [
-                "sha256:c79ad4db16c9a86071a3556fb5d619022b36b8880ba3ef416558ea95fbec4cb9",
-                "sha256:df3a7e90f1d3e4c9fe88a6b45c2ae58e61fe48a0fe0bc6de1544596e479a3f97"
+                "sha256:3bd4f503f4ebc58bae40d81e81a9176c400cbbac2ba2d877367595fb524dfdfc",
+                "sha256:425a129abb1614183fd1aca6982f650b47f8026867c0ce7c4b9f281c443d2740"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.6'",
-            "version": "==3.17.1"
+            "markers": "python_version >= '3.8'",
+            "version": "==5.1.0"
         },
         "python-dateutil": {
             "hashes": [
@@ -93,11 +93,11 @@
         },
         "typing-extensions": {
             "hashes": [
-                "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0",
-                "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"
+                "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d",
+                "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
             ],
-            "markers": "python_version < '3.10'",
-            "version": "==4.8.0"
+            "markers": "python_version < '3.11'",
+            "version": "==4.12.2"
         }
     },
     "develop": {
