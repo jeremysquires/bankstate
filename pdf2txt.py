@@ -6,7 +6,7 @@ import fitz
 import utils
 
 
-def get_run_params() -> Tuple[str, str, str]:
+def get_run_params() -> Tuple[str, str, str, str]:
     parser = argparse.ArgumentParser(
         prog="pdf2txt.py",
         description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
@@ -29,9 +29,10 @@ def get_run_params() -> Tuple[str, str, str]:
         ),
     )
     parser.add_argument("output", help=f"output is the path to the CSV/TSV output file")
+    parser.add_argument("capture", help=f"path to a raw data capture output file")
     args = parser.parse_args()
-    print(args.filename, args.filetype, args.output)
-    return args.filename, args.filetype, args.output
+    print(args.filename, args.filetype, args.output, args.capture)
+    return args.filename, args.filetype, args.output, args.capture
 
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
@@ -261,23 +262,22 @@ def output_lines(transaction_lines: List[str], output: str) -> None:
 
 
 # __main__: starts here
-filename, filetype, output = get_run_params()
+filename, filetype, output, capture = get_run_params()
 transaction_lines = []
+raw_text_lines = get_raw_text_lines_mupdf(filename)
+if capture:
+    output_lines(raw_text_lines, capture)
 if filetype == "bmo_bank":
     # checking
-    raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
 elif filetype == "bmo_card":
     # master card
-    raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_card_transactions(raw_text_lines)
 elif filetype == "rbc_bank":
     # checking
-    raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
 elif filetype == "rbc_card":
     # master card
-    raw_text_lines = get_raw_text_lines_mupdf(filename)
     transaction_lines = roll_up_card_transactions(raw_text_lines)
 
 output_lines(transaction_lines, output)
