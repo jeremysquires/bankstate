@@ -10,6 +10,7 @@ pipenv run test_rbc_bank2
 pipenv run test_rbc_bank_2023
 pipenv run test_rbc_bank_2025
 pipenv run test_rbc_card
+pipenv run test_rbc_card_2026
 
 # check test output
 cd test/data

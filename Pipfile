@@ -24,6 +24,7 @@ test_rbc_bank2 = "python pdf2txt.py ./test/data/rbc_bank2.pdf rbc_bank ./test/da
 test_rbc_bank_2023 = "python pdf2txt.py ./test/data/rbc_bank_2023.pdf rbc_bank ./test/data/rbc_bank_2023.tsv -c ./test/data/raw/rbc_bank_2023.txt"
 test_rbc_bank_2025 = "python pdf2txt.py ./test/data/rbc_bank_2025.pdf rbc_bank ./test/data/rbc_bank_2025.tsv -c ./test/data/raw/rbc_bank_2025.txt"
 test_rbc_card = "python pdf2txt.py ./test/data/rbc_card.pdf rbc_card ./test/data/rbc_card.tsv -c ./test/data/raw/rbc_card.txt"
+test_rbc_card_2026 = "python pdf2txt.py ./test/data/rbc_card_2026.pdf rbc_card ./test/data/rbc_card_2026.tsv -c ./test/data/raw/rbc_card_2026.txt"
 
 [requires]
 python_version = "3.8"
