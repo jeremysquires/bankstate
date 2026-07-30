@@ -44,8 +44,8 @@ def get_run_params() -> Tuple[str, str, str, str]:
         default=None
     )
     args = parser.parse_args()
-    print(args.input, args.filetype, args.output, args.capture or f"{args.output}.cap")
-    return args.input, args.filetype, args.output, args.capture or f"{args.output}.cap"
+    print(args.input, args.filetype, args.output, args.capture or "")
+    return args.input, args.filetype, args.output, args.capture or ""
 
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
