@@ -1,7 +1,13 @@
 CWD=$(pwd)
+
 if [ -f ../pdf2txt.py ]; then
   cd ..
+  if [ -d ./test/data/new ]; then
+    rm -Rf ./test/data/new
+  fi
 fi
+mkdir -p ./test/data/new
+
 pipenv run test_bmo_bank
 pipenv run test_bmo_card
 pipenv run test_bmo_card2
@@ -14,17 +20,11 @@ pipenv run test_rbc_card_2026
 
 # check test output
 cd test/data
-if [ -d ./new ]; then
-  rm -Rf ./new
-fi
 if [ -d ./orig ]; then
-  mkdir ./new
-  mv *.tsv ./new
   diff orig new
 else
   mkdir ./orig
-  mv *.tsv ./orig
+  cp ./new/*.tsv ./orig
 fi
 
 cd $CWD
-
