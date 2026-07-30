@@ -10,16 +10,16 @@ def get_run_params() -> Tuple[str, str, str, str]:
     parser = argparse.ArgumentParser(
         prog="pdf2txt.py",
         description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
-        epilog=f"Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net> "
+        epilog=f"Copyright (C) 2017, 2023, 2026 Jeremy Squires <jms@mailforce.net> "
         f"License: <https://opensource.org/licenses/MIT>",
     )
     parser.add_argument(
-        "filename", help="filename is the path to a PDF bank eStatement"
+        "filename",
+        help="filename is the path to a PDF bank eStatement"
     )
     parser.add_argument(
         "filetype",
         choices=["bmo_bank", "bmo_card", "rbc_bank", "rbc_card"],
-        default="bmo_bank",
         help=(
             f"is the type of input bank statement: "
             f"bmo is the Bank of Montreal, "
@@ -28,11 +28,21 @@ def get_run_params() -> Tuple[str, str, str, str]:
             f"_card is a MasterCard statement"
         ),
     )
-    parser.add_argument("output", help=f"output is the path to the CSV/TSV output file")
-    parser.add_argument("capture", help=f"path to a raw data capture output file")
+    parser.add_argument(
+        "output",
+        help=f"output is the path to the CSV/TSV output file"
+    )
+    parser.add_argument(
+        "--capture",
+        help=(
+            f"path to a raw data capture output file,"
+            f" defaults to <output>.cap"
+        ),
+        default=None
+    )
     args = parser.parse_args()
-    print(args.filename, args.filetype, args.output, args.capture)
-    return args.filename, args.filetype, args.output, args.capture
+    print(args.filename, args.filetype, args.output, args.capture or f"{args.output}.cap")
+    return args.filename, args.filetype, args.output, args.capture or f"{args.output}.cap"
 
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
