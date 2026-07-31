@@ -6,14 +6,14 @@ import fitz
 import utils
 
 
-def get_run_params() -> Tuple[str, str, str, str]:
+def get_run_params() -> Tuple[str, str, str, str, str]:
     parser = argparse.ArgumentParser(
         prog="pdf2txt.py",
         description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
         epilog=(
             f"Copyright (C) 2017, 2023, 2026 Jeremy Squires <jms@mailforce.net> "
             f"License: <https://opensource.org/licenses/MIT>"
-        )
+        ),
     )
     parser.add_argument(
         "input",
@@ -37,15 +37,19 @@ def get_run_params() -> Tuple[str, str, str, str]:
     parser.add_argument(
         "--capture",
         "-c",
-        help=(
-            f"path to a raw data capture output file,"
-            f" defaults to <output>.cap"
-        ),
-        default=None
+        help=(f"path to a raw data capture output file," f" defaults to <output>.cap"),
+        default=None,
+    )
+    parser.add_argument(
+        "--format",
+        "-f",
+        choices=["pdf", "cap"],
+        help=(f"format of input file, default pdf, cap for captures"),
+        default="pdf",
     )
     args = parser.parse_args()
-    print(args.input, args.filetype, args.output, args.capture or "")
-    return args.input, args.filetype, args.output, args.capture or ""
+    print(args.input, args.filetype, args.output, args.capture or "", args.format or "")
+    return args.input, args.filetype, args.output, args.capture or "", args.format or ""
 
 
 def get_raw_text_lines_pypdf(filename: str) -> List[str]:
@@ -74,6 +78,12 @@ def get_raw_text_lines_mupdf(filename: str) -> List[str]:
     for pageObject in doc:
         page = pageObject.get_text()  # .encode("utf8")
         text_lines.extend(page.split("\n"))
+    return text_lines
+
+
+def get_raw_text_lines_cap(filename: str) -> List[str]:
+    with open(filename, mode="r", encoding="utf8") as file:
+        text_lines = file.readlines()
     return text_lines
 
 
@@ -275,9 +285,12 @@ def output_lines(transaction_lines: List[str], output: str) -> None:
 
 
 # __main__: starts here
-filename, filetype, output, capture = get_run_params()
+input, filetype, output, capture, input_format = get_run_params()
 transaction_lines = []
-raw_text_lines = get_raw_text_lines_mupdf(filename)
+if input_format == "pdf":
+    raw_text_lines = get_raw_text_lines_mupdf(input)
+else:
+    raw_text_lines = get_raw_text_lines_cap(input)
 if capture:
     output_lines(raw_text_lines, capture)
 if filetype == "bmo_bank":

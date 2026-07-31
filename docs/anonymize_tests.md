@@ -9,8 +9,8 @@ On the other hand, bankstate generates a text representation of the PDF before p
 ## Steps
 
 [X] Capture the text output and store it on disk
-[] Make capture optional, based upon need to debug
-[] Process the text output directly, instead of using a PDF for input
+[X] Make capture optional, based upon need to debug
+[X] Process the text output directly, instead of using a PDF for input
 [] Anonymize the existing test data and publish it
 [] Build the anonymization process into the text capture
 [] Document the steps to provide bug reports
