@@ -60,6 +60,8 @@ This file can be more easily examined than the PDF to determine whether the prob
 
 These captured exports can also be sanitized or anonymized to remove any personally identifiable information in case they need to be reproduced or debugged by someone other than the owner of the data.
 
+In order to test changes to the raw text itself, add the parameter `--format cap` and pass the path to the raw text capture file in as the input filename rather than a PDF.
+
 ## Import Into Budgeting Software
 
 For financial packages with flexible CSV/TSV import (MoneyManagementEX, GnuCash):
