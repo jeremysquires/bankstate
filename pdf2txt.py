@@ -158,6 +158,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
         elif in_balance:
             initial_balance = float(text_line.replace(",", "").replace("$", ""))
             in_balance = False
+            in_rollup = False
         elif utils.is_dd_mon_date(text_line):
             in_rollup = True
             in_balance = False
@@ -284,26 +285,30 @@ def output_lines(transaction_lines: List[str], output: str) -> None:
             output_file.write(f"{line}\n")
 
 
-# __main__: starts here
-input, filetype, output, capture, input_format = get_run_params()
-transaction_lines = []
-if input_format == "pdf":
-    raw_text_lines = get_raw_text_lines_mupdf(input)
-else:
-    raw_text_lines = get_raw_text_lines_cap(input)
-if capture:
-    output_lines(raw_text_lines, capture)
-if filetype == "bmo_bank":
-    # checking
-    transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
-elif filetype == "bmo_card":
-    # master card
-    transaction_lines = roll_up_card_transactions(raw_text_lines)
-elif filetype == "rbc_bank":
-    # checking
-    transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
-elif filetype == "rbc_card":
-    # master card
-    transaction_lines = roll_up_card_transactions(raw_text_lines)
+def process():
+    input, filetype, output, capture, input_format = get_run_params()
+    transaction_lines = []
+    if input_format == "pdf":
+        raw_text_lines = get_raw_text_lines_mupdf(input)
+    else:
+        raw_text_lines = get_raw_text_lines_cap(input)
+    if capture:
+        output_lines(raw_text_lines, capture)
+    if filetype == "bmo_bank":
+        # checking
+        transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
+    elif filetype == "bmo_card":
+        # master card
+        transaction_lines = roll_up_card_transactions(raw_text_lines)
+    elif filetype == "rbc_bank":
+        # checking
+        transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
+    elif filetype == "rbc_card":
+        # master card
+        transaction_lines = roll_up_card_transactions(raw_text_lines)
 
-output_lines(transaction_lines, output)
+    output_lines(transaction_lines, output)
+
+
+if __name__ == "__main__":
+    process()
