@@ -17,9 +17,9 @@
 #   If the new output is correct, copy it to the data/orig folder for new runs to check regression.
 #
 # Add new test:
-# 1. run a new command line in this script
-# 2. the diff will identify any files not already in data/orig
-# 3. check the output in data/new, and if correct, copy it to data/orig
+#   1. run a new command line in this script
+#   2. the diff will identify any files not already in data/orig
+#   3. check the output in data/new, and if correct, copy it to data/orig
 
 CWD=$(pwd)
 
@@ -58,5 +58,11 @@ else
   mkdir ./orig
   cp ./new/*.tsv ./orig
 fi
+
+# check processing raw input test_bmo_bank will result in the same output (don't need to check all of them)
+cd ../..
+pipenv run python pdf2txt.py ./test/data/raw/bmo_bank.txt bmo_bank ./test/data/new/bmo_bank.tsv -f cap
+cd test/data
+diff orig new
 
 cd $CWD

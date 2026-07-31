@@ -83,7 +83,7 @@ def get_raw_text_lines_mupdf(filename: str) -> List[str]:
 
 def get_raw_text_lines_cap(filename: str) -> List[str]:
     with open(filename, mode="r", encoding="utf8") as file:
-        text_lines = file.readlines()
+        text_lines = [line.rstrip("\r\n") for line in file.readlines()]
     return text_lines
 
 
