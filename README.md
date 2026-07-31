@@ -6,7 +6,7 @@ When doing a budget, the first step is invariably to collect at least a year's w
 
 ## License
 
-Copyright (C) 2017, 2023 Jeremy Squires <jms@mailforce.net>
+Copyright (C) 2017, 2023, 2026 Jeremy Squires <jms@mailforce.net>
 
 License: <https://opensource.org/licenses/MIT>
 
@@ -40,14 +40,25 @@ Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> an
 
 ### Process
 
-* git clone git@github.com:jeremysquires/bankstate.git
-* cd bankstate
-* pipenv install --dev
-* pipenv shell
-* python pdf2txt.py filename.pdf filetype output.tsv
-  * Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
+```bash
+git clone git@github.com:jeremysquires/bankstate.git
+cd bankstate
+pipenv install --dev
+pipenv shell
+python pdf2txt.py filename.pdf <filetype> output.tsv
+# Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
+```
+
 * Open TSV in LibreOffice/Excel to verify it has the correct structure
 * Import Into Budgeting Software
+
+### Capture Export Text for Debug
+
+Add the parameter `--capture <capture_filepath>` or `-c <capture_filepath>` to save the raw text exported from the PDF to a file.
+
+This file can be more easily examined than the PDF to determine whether the problem was in the PDF export or in the text parser.
+
+These captured exports can also be sanitized or anonymized to remove any personally identifiable information in case they need to be reproduced or debugged by someone other than the owner of the data.
 
 ## Import Into Budgeting Software
 
@@ -93,12 +104,15 @@ For HomeBank users:
 
 ### Process
 
-* git clone git@github.com:jeremysquires/bankstate.git
-* cd bankstate
-* pipenv install --dev
-* pipenv shell
-* Prepare input text using the correct `Text Copy` procedure
-* python stmt2csv.py bankstatement.txt > output.csv
+```bash
+git clone git@github.com:jeremysquires/bankstate.git
+cd bankstate
+pipenv install --dev
+pipenv shell
+# Prepare input text using the correct `Text Copy` procedure
+python stmt2csv.py bankstatement.txt > output.csv
+```
+
 * Open CSV in LibreOffice/Excel to verify it has the correct structure
 * Import Into Budgeting Software
 
@@ -231,14 +245,16 @@ AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	
 
 ## Tests
 
-There are unit tests for the utils that can be run with `pipenv run test`.
-Testing the handlers requires some PDF data samples.
-Once the PDF Data Samples are set up, you can run `pipenv run test_<statement_type>`.
-See Pipfile for the list of tests available under the `scripts` section.
+* There are unit tests for the utils that can be run with `pipenv run test`.
+* Testing the handlers requires some PDF data samples.
+* Once the PDF Data Samples are set up, you can run `pipenv run test_handlers`.
+* See the `test/test_handlers.sh` script for the list of tests available under the `scripts` section.
 
 ### PDF Data Samples
 
-In the `test/data` folder, add the following PDF files from samples you download (they won't be added to the repo because of a .gitignore on the `test/data` folder):
+In the `test/data/input` folder, add the following PDF files from samples you download
+
+(NOTE: none of the test data will be added to the repo because of a `.gitignore` on the `test/data` folder):
 
 * bmo_bank.pdf
 * bmo_card.pdf
@@ -252,18 +268,42 @@ In the `test/data` folder, add the following PDF files from samples you download
 
 If you have a `bash` interpreter installed, you can run the tests and comparisons all in one.
 
-* `cd test`
-* `bash test_handlers.sh`
+```bash
+cd test
+bash test_handlers.sh
+```
 
-The `test/data/orig` and `test/data/new` folders will be created by the `test_handlers.sh` script.
-The first time it runs it will populate the `orig` folder with the `.tsv` files.
-Every subsequent run, the `new` folder will be populated and compared with the `orig` using `diff`.
+### Data structure
 
-## Debug
+(NOTE: `test/data` is gitignored so PII is not uploaded to git):
 
-The debug setup uses VSCode.
-Debug scenarios are set up in `.vscode/launch.json`
-In VSCode, open the `Run and Debug` side panel (the bug and triangle icon)
-Open the `pdf2txt.py` python script in an editor window.
-Pull down the dropdown to the right of the Green Debug triangle at the top of the panel.
-Select the test you want to debug.
+* input PDFs from `data/input`
+* output TSVs to `data/new`
+* capture TXTs to `data/raw`
+* validated TSV output in `data/orig`
+
+### First Run
+
+* All the newly created outputs will be copied automatically to the `data/orig` folder
+  * WARN: You need to check all of these by hand, ensuring that they are correct, otherwise the next time you run the tests, they will all be reported green, whether they are good or not.
+* Remove any incorrect output from the orig folder.
+
+### Debug Runs
+
+* Each time you make changes and fix the output in new, check it for correctness.
+* If the new output is correct, copy it to the data/orig folder for new runs to check regression.
+
+### Add New Test
+
+1. Add a new command line to the `test_handlers.sh` script and run it
+2. The diff output will identify any files not already in `data/orig`
+3. Check the output in `data/new`, and if correct, copy it to `data/orig`
+
+## Debug Unit Tests
+
+* The debug setup uses VSCode.
+* Debug scenarios are set up in `.vscode/launch.json`
+* In VSCode, open the `Run and Debug` side panel (the bug and triangle icon)
+* Open the `pdf2txt.py` python script in an editor window.
+* Pull down the dropdown to the right of the Green Debug triangle at the top of the panel.
+* Select the test you want to debug.
