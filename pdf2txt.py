@@ -147,10 +147,15 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     epsilon = 0.01
     parts = []
     days_entries = []
-    year = str(datetime.now().year)
+    year = datetime.now().year
+    start_month = datetime.now().month
+    date_line_prefix = "Your opening balance on "
     for text_line in text_lines:
-        if "Your opening balance on" in text_line:
-            year = text_line[-4:]
+        if date_line_prefix in text_line:
+            entry_date_string = text_line.split(date_line_prefix)[1]
+            entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
+            year = entry_datetime.year
+            start_month = entry_datetime.month
         text_line = text_line.replace("\t", " ")
         if text_line == "Opening Balance":
             in_balance = True
@@ -165,6 +170,9 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             roll_up = ""
             days_entries = []
+            if start_month == 12 and "Jan" in text_line:
+                year = year + 1
+                start_month = 1
             current_date = f"{text_line} {year}"
         elif in_rollup:
             field_number += 1

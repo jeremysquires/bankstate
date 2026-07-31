@@ -14,14 +14,26 @@ class TestParser(unittest.TestCase):
             "1,000.00",
             "10,000.00",
             "1 Jan",
-            "e-Transfer sent BUCKY BALLS",
+            "e-Transfer sent BUCKS FOR YOU",
             "300.00",
-            "28,906.48",
+            "9,700.00",
+            "6 Jan",
+            "e-Transfer sent MORE BUCKS FOR YOU",
+            "700.00",
+            "9,000.00",
         ]
         result_lines = roll_up_rbc_bank_transactions(date_lines)
-        result_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
         self.assertEqual(
-            result_year, "2025"
+            start_year, "2024"
+        )
+        self.assertEqual(
+            end_year, "2025"
+        )
+        self.assertEqual(
+            continue_year, "2025"
         )
 
 
