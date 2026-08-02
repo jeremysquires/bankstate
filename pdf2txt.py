@@ -95,9 +95,8 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     initial_balance = 0.0
     current_balance = 0.0
     parts = []
-    # TODO: would it be better to fail rather than process current date?
-    end_year = datetime.now().year
-    end_month = datetime.now().month
+    end_year = None
+    end_month = None
     last_month = None
     date_line_prefix = "For the period ending "
     for text_line in text_lines:
@@ -165,8 +164,8 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     epsilon = 0.01
     parts = []
     days_entries = []
-    year = datetime.now().year
-    start_month = datetime.now().month
+    year = None
+    start_month = None
     date_line_prefix = "Your opening balance on "
     for text_line in text_lines:
         if date_line_prefix in text_line:
