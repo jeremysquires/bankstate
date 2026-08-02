@@ -95,16 +95,34 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     initial_balance = 0.0
     current_balance = 0.0
     parts = []
-    year = str(datetime.now().year)
+    # TODO: would it be better to fail rather than process current date?
+    end_year = datetime.now().year
+    end_month = datetime.now().month
+    last_month = None
+    date_line_prefix = "For the period ending "
     for text_line in text_lines:
-        if "For the period ending" in text_line:
-            year = text_line[-4:]
+        if date_line_prefix in text_line:
+            entry_date_string = text_line.split(date_line_prefix)[1]
+            entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
+            end_year = entry_datetime.year
+            end_month = entry_datetime.month
         text_line = text_line.replace("\t", " ")
-        if utils.is_mon_dd_date(text_line):
+        if utils.is_two_part_date(text_line):
             in_rollup = True
             field_number = 0
-            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
-            roll_up = f"{mon_dd} {year}"
+            text_line = text_line.replace(".", "")
+            dd_mon = text_line
+            if utils.is_mon_dd_date(text_line):
+                dd_mon = utils.switch_two_part_date(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
+            if last_month and last_month > entry_datetime.month:
+                year = year + 1
+            elif not last_month and end_month < entry_datetime.month:
+                year = end_year - 1
+            elif not last_month and end_month >= entry_datetime.month:
+                year = end_year
+            last_month = entry_datetime.month
+            roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             roll_up = f"{roll_up}\t{text_line}"
@@ -248,13 +266,15 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             year = text_line[-4:]
         text_line = text_line.replace("\t", " ")
         if not in_rollup and (
-            utils.is_mon_dot_dd_date(text_line) or utils.is_mon_dd_date(text_line)
+            utils.is_two_part_date(text_line)
         ):
             in_rollup = True
             field_number = 0
             text_line = text_line.replace(".", "")
-            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
-            roll_up = f"{mon_dd} {year}"
+            dd_mon = text_line
+            if utils.is_mon_dd_date(text_line):
+                dd_mon = utils.switch_two_part_date(text_line)
+            roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:

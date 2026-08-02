@@ -7,6 +7,14 @@ import utils
 
 
 class TestUtils(unittest.TestCase):
+    def test_is_two_part_date(self):
+        self.assertTrue(utils.is_two_part_date("Jan 05"))
+        self.assertFalse(utils.is_two_part_date("Gak 05"))
+        self.assertTrue(utils.is_two_part_date("Jan. 05"))
+        self.assertFalse(utils.is_two_part_date("Gak. 05"))
+        self.assertTrue(utils.is_two_part_date("05 Jan"))
+        self.assertTrue(utils.is_two_part_date("5 Jan"))
+
     def test_is_mon_dd_date(self):
         self.assertTrue(utils.is_mon_dd_date("Jan 05"))
         self.assertFalse(utils.is_mon_dd_date("Gak 05"))

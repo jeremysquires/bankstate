@@ -27,7 +27,15 @@ def is_format_date(string, format):
         return False
 
 
-def dd_mon_to_mon_dd_date(string):
+def is_two_part_date(string):
+    return (
+        is_mon_dot_dd_date(string)
+        or is_mon_dd_date(string)
+        or is_dd_mon_date(string)
+    )
+
+
+def switch_two_part_date(string):
     date_part = string.split(" ")
     return f"{date_part[1]} {date_part[0]}"
 
