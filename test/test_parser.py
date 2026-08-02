@@ -37,6 +37,37 @@ class TestParser(unittest.TestCase):
         )
 
 
+    def test_month_jump_bmo_bank(self):
+        date_lines = [
+            "For the period ending May 06, 2024",
+            "Sep 21",
+            "INTERAC e-Transfer Sent",
+            "1,000.00",
+            "10,000.00",
+            "Mar 01",
+            "INTERAC e-Transfer Sent",
+            "300.00",
+            "9,700.00",
+            "May 06",
+            "INTERAC e-Transfer Sent",
+            "700.00",
+            "9,000.00",
+        ]
+        result_lines = roll_up_bmo_bank_transactions(date_lines)
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        self.assertEqual(
+            start_year, "2023"
+        )
+        self.assertEqual(
+            end_year, "2024"
+        )
+        self.assertEqual(
+            continue_year, "2024"
+        )
+
+
     def test_date_change_rbc_bank(self):
         date_lines = [
             "Your opening balance on December 20, 2024",
@@ -49,6 +80,37 @@ class TestParser(unittest.TestCase):
             "300.00",
             "9,700.00",
             "6 Jan",
+            "e-Transfer sent MORE BUCKS FOR YOU",
+            "700.00",
+            "9,000.00",
+        ]
+        result_lines = roll_up_rbc_bank_transactions(date_lines)
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        self.assertEqual(
+            start_year, "2024"
+        )
+        self.assertEqual(
+            end_year, "2025"
+        )
+        self.assertEqual(
+            continue_year, "2025"
+        )
+
+
+    def test_month_jumps_rbc_bank(self):
+        date_lines = [
+            "Your opening balance on September 20, 2024",
+            "21 Sep",
+            "Online Banking transfer - 5555",
+            "1,000.00",
+            "10,000.00",
+            "1 Mar",
+            "e-Transfer sent BUCKS FOR YOU",
+            "300.00",
+            "9,700.00",
+            "6 Mar",
             "e-Transfer sent MORE BUCKS FOR YOU",
             "700.00",
             "9,000.00",
