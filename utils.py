@@ -29,9 +29,7 @@ def is_format_date(string, format):
 
 def is_two_part_date(string):
     return (
-        is_mon_dot_dd_date(string)
-        or is_mon_dd_date(string)
-        or is_dd_mon_date(string)
+        is_mon_dot_dd_date(string) or is_mon_dd_date(string) or is_dd_mon_date(string)
     )
 
 

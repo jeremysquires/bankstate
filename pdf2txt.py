@@ -265,9 +265,7 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
         elif "STATEMENT FROM" in text_line:
             year = text_line[-4:]
         text_line = text_line.replace("\t", " ")
-        if not in_rollup and (
-            utils.is_two_part_date(text_line)
-        ):
+        if not in_rollup and (utils.is_two_part_date(text_line)):
             in_rollup = True
             field_number = 0
             text_line = text_line.replace(".", "")
