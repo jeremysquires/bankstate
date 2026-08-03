@@ -216,6 +216,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                 partial_balance = 0.0
                 for day_entry in days_entries:
                     parts = day_entry.split("\t")
+                    value = float(parts[2].replace(",", ""))
                     # no way to determine if it is a + or -
                     # use text to identify common deposits
                     if (
@@ -224,13 +225,18 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                         or "redemption" in parts[1]
                         or "received" in parts[1]
                     ):
-                        partial_balance += float(parts[2].replace(",", ""))
+                        partial_balance += value
                         parts.insert(2, "")
                     else:
                         # all others are assumed withdrawals
-                        partial_balance -= float(parts[2].replace(",", ""))
+                        partial_balance -= value
                         parts.insert(3, "")
-                    roll_up_lines.append("\t".join(utils.trim_parts(parts)))
+                    appendit = (
+                        "\t".join(utils.trim_parts(parts))
+                        + "\t"
+                        + "{:,.2f}".format(initial_balance + partial_balance)
+                    )
+                    roll_up_lines.append(appendit)
                     days_entries = []
                 roll_up = f"{roll_up}\t{text_line}"
                 in_rollup = False
