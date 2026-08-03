@@ -39,10 +39,14 @@ def switch_two_part_date(string):
 
 
 def normalize_mon_dd(string):
+    if len(string) < 4:
+        return string
     return string[0] + string[1:3].lower() + string[3:]
 
 
 def normalize_dd_mon(string):
+    if len(string) < 2:
+        return string
     return string[0:-2] + string[-2:].lower()
 
 
