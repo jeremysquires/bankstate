@@ -98,6 +98,7 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     end_year = None
     end_month = None
     last_month = None
+    year = None
     date_line_prefix = "For the period ending "
     for text_line in text_lines:
         if date_line_prefix in text_line:
@@ -109,10 +110,7 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
         if utils.is_two_part_date(text_line):
             in_rollup = True
             field_number = 0
-            text_line = text_line.replace(".", "")
-            dd_mon = text_line
-            if utils.is_mon_dd_date(text_line):
-                dd_mon = utils.switch_two_part_date(text_line)
+            dd_mon = utils.normalize_to_dd_mon(text_line)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
             if last_month and last_month > entry_datetime.month:
                 year = year + 1
@@ -169,6 +167,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     date_line_prefix = "Your opening balance on "
     for text_line in text_lines:
         if date_line_prefix in text_line:
+            # rbc bank stmts move forward from the opening balance time
             entry_date_string = text_line.split(date_line_prefix)[1]
             entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
             year = entry_datetime.year
@@ -187,11 +186,12 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             roll_up = ""
             days_entries = []
-            entry_datetime = datetime.strptime(text_line, "%d %b")
+            dd_mon = utils.normalize_to_dd_mon(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
             if last_month > entry_datetime.month:
                 year = year + 1
                 last_month = entry_datetime.month
-            current_date = f"{text_line} {year}"
+            current_date = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -258,20 +258,36 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     roll_up = ""
     in_rollup = False
     field_number = 0
-    year = str(datetime.now().year)
+    end_year = None
+    end_month = None
+    year = None
+    last_month = None
     for text_line in text_lines:
-        if "Previous Balance" in text_line:
-            year = text_line[-4:]
+        if "New Balance, " in text_line:
+            # BMO MC
+            end_date_string = text_line.split("New Balance, ")[1]
+            end_datetime = datetime.strptime(end_date_string, "%b. %d, %Y")
+            end_year = end_datetime.year
+            end_month = end_datetime.month
         elif "STATEMENT FROM" in text_line:
-            year = text_line[-4:]
+            # RBC MC
+            end_date_string = text_line[-12:]   # TODO: use regex so no strip and do not abuse mon dd norm
+            end_datetime = datetime.strptime(utils.normalize_mon_dd(end_date_string.strip()), "%b %d, %Y")
+            end_year = end_datetime.year
+            end_month = end_datetime.month
         text_line = text_line.replace("\t", " ")
         if not in_rollup and (utils.is_two_part_date(text_line)):
             in_rollup = True
             field_number = 0
-            text_line = text_line.replace(".", "")
-            dd_mon = text_line
-            if utils.is_mon_dd_date(text_line):
-                dd_mon = utils.switch_two_part_date(text_line)
+            dd_mon = utils.normalize_to_dd_mon(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
+            if last_month and last_month > entry_datetime.month:
+                year = year + 1
+            elif not last_month and end_month < entry_datetime.month:
+                year = end_year - 1
+            elif not last_month and end_month >= entry_datetime.month:
+                year = end_year
+            last_month = entry_datetime.month
             roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1

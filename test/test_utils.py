@@ -77,5 +77,70 @@ class TestUtils(unittest.TestCase):
         )
 
 
+    def test_normalize_mon_dd_zero_pad(self):
+        capsmon = "DEC 03"
+        self.assertEqual(
+           utils.normalize_mon_dd(capsmon), "Dec 03"
+        )
+
+
+    def test_normalize_mon_dd_no_pad(self):
+        capsmon = "DEC 3"
+        self.assertEqual(
+           utils.normalize_mon_dd(capsmon), "Dec 3"
+        )
+
+
+    def test_normalize_mon_dot_dd_no_pad(self):
+        capsmon = "DEC. 3"
+        self.assertEqual(
+           utils.normalize_mon_dd(capsmon), "Dec. 3"
+        )
+
+
+    def test_normalize_dd_mon_zero_pad(self):
+        capsmon = "03 DEC"
+        self.assertEqual(
+           utils.normalize_dd_mon(capsmon), "03 Dec"
+        )
+
+
+    def test_normalize_dd_mon_no_pad(self):
+        capsmon = "3 DEC"
+        self.assertEqual(
+           utils.normalize_dd_mon(capsmon), "3 Dec"
+        )
+
+
+    def test_normalize_to_dd_mon(self):
+        test_string = "3 DEC"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "3 Dec"
+        )
+        test_string = "03 DEC"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "03 Dec"
+        )
+        test_string = "DEC 3"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "3 Dec"
+        )
+        test_string = "DEC 03"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "03 Dec"
+        )
+        test_string = "DEC. 03"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "03 Dec"
+        )
+        test_string = "Dec 03"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "03 Dec"
+        )
+        test_string = "Dec 3"
+        self.assertEqual(
+           utils.normalize_to_dd_mon(test_string), "3 Dec"
+        )
+
 if __name__ == "__main__":
     unittest.main()

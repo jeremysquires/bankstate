@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from pdf2txt import roll_up_rbc_bank_transactions, roll_up_bmo_bank_transactions
+from pdf2txt import roll_up_rbc_bank_transactions, roll_up_bmo_bank_transactions, roll_up_card_transactions
 
 class TestParser(unittest.TestCase):
     def test_date_change_bmo_bank(self):
@@ -127,6 +127,76 @@ class TestParser(unittest.TestCase):
         )
         self.assertEqual(
             continue_year, "2025"
+        )
+
+
+    def test_date_change_bmo_card(self):
+        date_lines = [
+            "New Balance, Jan. 6, 2024",
+            "Dec. 17",
+            "Dec. 17",
+            "Membership",
+            "MyMembership",
+            "3298749847539874",
+            "100.00",
+            "Jan. 1",
+            "Jan. 3",
+            "Food Court",
+            "City",
+            "Province",
+            "9808938408093",
+            "30.00",
+            "Jan. 4",
+            "Jan. 6",
+            "GAS GAS GAS",
+            "100.00"
+        ]
+        result_lines = roll_up_card_transactions(date_lines)
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        self.assertEqual(
+            start_year, "2023"
+        )
+        self.assertEqual(
+            end_year, "2024"
+        )
+        self.assertEqual(
+            continue_year, "2024"
+        )
+
+
+    def test_date_change_rbc_card(self):
+        date_lines = [
+            "STATEMENT FROM DEC 17, 2025 TO JAN 6, 2026",
+            "DEC 17",
+            "DEC 17",
+            "Membership",
+            "MyMembership",
+            "3298749847539874",
+            "100.00",
+            "JAN 1",
+            "JAN 3",
+            "Food Court City Province",
+            "9808938408093",
+            "30.00",
+            "JAN 4",
+            "JAN 6",
+            "GAS GAS GAS",
+            "100.00"
+        ]
+        result_lines = roll_up_card_transactions(date_lines)
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        self.assertEqual(
+            start_year, "2025"
+        )
+        self.assertEqual(
+            end_year, "2026"
+        )
+        self.assertEqual(
+            continue_year, "2026"
         )
 
 
