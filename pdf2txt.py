@@ -154,6 +154,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     roll_up = ""
     in_rollup = False
     in_balance = False
+    in_date = False
     field_number = 0
     initial_balance = 0.0
     current_balance = 0.0
@@ -176,13 +177,16 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
         if text_line == "Opening Balance":
             in_balance = True
             in_rollup = False
+            in_date = False
         elif in_balance:
             initial_balance = float(text_line.replace(",", "").replace("$", ""))
             in_balance = False
             in_rollup = False
+            in_date = False
         elif utils.is_dd_mon_date(text_line):
             in_rollup = True
             in_balance = False
+            in_date = True
             field_number = 0
             roll_up = ""
             days_entries = []
@@ -192,7 +196,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                 year = year + 1
                 previous_month = entry_datetime.month
             current_date = f"{dd_mon} {year}"
-        elif in_rollup:
+        elif in_rollup or in_date:
             field_number += 1
             if field_number == 1:
                 roll_up = f"{current_date}\t{text_line}"
