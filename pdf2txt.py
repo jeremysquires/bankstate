@@ -271,8 +271,12 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             end_month = end_datetime.month
         elif "STATEMENT FROM" in text_line:
             # RBC MC
-            end_date_string = text_line[-12:]   # TODO: use regex so no strip and do not abuse mon dd norm
-            end_datetime = datetime.strptime(utils.normalize_mon_dd(end_date_string.strip()), "%b %d, %Y")
+            end_date_string = text_line[
+                -12:
+            ]  # TODO: use regex so no strip and do not abuse mon dd norm
+            end_datetime = datetime.strptime(
+                utils.normalize_mon_dd(end_date_string.strip()), "%b %d, %Y"
+            )
             end_year = end_datetime.year
             end_month = end_datetime.month
         text_line = text_line.replace("\t", " ")

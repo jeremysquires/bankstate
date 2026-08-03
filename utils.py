@@ -60,7 +60,7 @@ def is_mon_dot_dd_date(string):
 
 def normalize_to_dd_mon(string):
     dd_mon = None
-    string = string.replace(".","")
+    string = string.replace(".", "")
     if is_mon_dd_date(string):
         dd_mon = switch_two_part_date(normalize_mon_dd(string))
     else:
