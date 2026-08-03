@@ -218,6 +218,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                         "Deposit" in parts[1]
                         or "rebate" in parts[1]
                         or "redemption" in parts[1]
+                        or "received" in parts[1]
                     ):
                         partial_balance += float(parts[2].replace(",", ""))
                         parts.insert(2, "")
