@@ -95,16 +95,31 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     initial_balance = 0.0
     current_balance = 0.0
     parts = []
-    year = str(datetime.now().year)
+    end_year = None
+    end_month = None
+    previous_month = None
+    year = None
+    date_line_prefix = "For the period ending "
     for text_line in text_lines:
-        if "For the period ending" in text_line:
-            year = text_line[-4:]
+        if date_line_prefix in text_line:
+            entry_date_string = text_line.split(date_line_prefix)[1]
+            entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
+            end_year = entry_datetime.year
+            end_month = entry_datetime.month
         text_line = text_line.replace("\t", " ")
-        if utils.is_mon_dd_date(text_line):
+        if utils.is_two_part_date(text_line):
             in_rollup = True
             field_number = 0
-            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
-            roll_up = f"{mon_dd} {year}"
+            dd_mon = utils.normalize_to_dd_mon(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
+            if previous_month and previous_month > entry_datetime.month:
+                year = year + 1
+            elif not previous_month and end_month < entry_datetime.month:
+                year = end_year - 1
+            elif not previous_month and end_month >= entry_datetime.month:
+                year = end_year
+            previous_month = entry_datetime.month
+            roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             roll_up = f"{roll_up}\t{text_line}"
@@ -147,10 +162,16 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     epsilon = 0.01
     parts = []
     days_entries = []
-    year = str(datetime.now().year)
+    year = None
+    previous_month = None
+    date_line_prefix = "Your opening balance on "
     for text_line in text_lines:
-        if "Your opening balance on" in text_line:
-            year = text_line[-4:]
+        if date_line_prefix in text_line:
+            # rbc bank stmts move forward from the opening balance time
+            entry_date_string = text_line.split(date_line_prefix)[1]
+            entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
+            year = entry_datetime.year
+            previous_month = entry_datetime.month
         text_line = text_line.replace("\t", " ")
         if text_line == "Opening Balance":
             in_balance = True
@@ -158,13 +179,19 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
         elif in_balance:
             initial_balance = float(text_line.replace(",", "").replace("$", ""))
             in_balance = False
+            in_rollup = False
         elif utils.is_dd_mon_date(text_line):
             in_rollup = True
             in_balance = False
             field_number = 0
             roll_up = ""
             days_entries = []
-            current_date = f"{text_line} {year}"
+            dd_mon = utils.normalize_to_dd_mon(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
+            if previous_month > entry_datetime.month:
+                year = year + 1
+                previous_month = entry_datetime.month
+            current_date = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -231,21 +258,41 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     roll_up = ""
     in_rollup = False
     field_number = 0
-    year = str(datetime.now().year)
+    end_year = None
+    end_month = None
+    year = None
+    previous_month = None
     for text_line in text_lines:
-        if "Previous Balance" in text_line:
-            year = text_line[-4:]
-        elif "STATEMENT FROM" in text_line:
-            year = text_line[-4:]
+        if text_line.startswith("New Balance, "):
+            # BMO MC
+            end_date_string = text_line.split("New Balance, ")[1]
+            end_datetime = datetime.strptime(end_date_string, "%b. %d, %Y")
+            end_year = end_datetime.year
+            end_month = end_datetime.month
+        elif text_line.startswith("STATEMENT FROM"):
+            # RBC MC
+            end_date_string = text_line[
+                -12:
+            ]  # TODO: use regex so no strip and do not abuse mon dd norm
+            end_datetime = datetime.strptime(
+                utils.normalize_mon_dd(end_date_string.strip()), "%b %d, %Y"
+            )
+            end_year = end_datetime.year
+            end_month = end_datetime.month
         text_line = text_line.replace("\t", " ")
-        if not in_rollup and (
-            utils.is_mon_dot_dd_date(text_line) or utils.is_mon_dd_date(text_line)
-        ):
+        if not in_rollup and (utils.is_two_part_date(text_line)):
             in_rollup = True
             field_number = 0
-            text_line = text_line.replace(".", "")
-            mon_dd = utils.dd_mon_to_mon_dd_date(text_line)
-            roll_up = f"{mon_dd} {year}"
+            dd_mon = utils.normalize_to_dd_mon(text_line)
+            entry_datetime = datetime.strptime(dd_mon, "%d %b")
+            if previous_month and previous_month > entry_datetime.month:
+                year = year + 1
+            elif not previous_month and end_month < entry_datetime.month:
+                year = end_year - 1
+            elif not previous_month and end_month >= entry_datetime.month:
+                year = end_year
+            previous_month = entry_datetime.month
+            roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -284,26 +331,30 @@ def output_lines(transaction_lines: List[str], output: str) -> None:
             output_file.write(f"{line}\n")
 
 
-# __main__: starts here
-input, filetype, output, capture, input_format = get_run_params()
-transaction_lines = []
-if input_format == "pdf":
-    raw_text_lines = get_raw_text_lines_mupdf(input)
-else:
-    raw_text_lines = get_raw_text_lines_cap(input)
-if capture:
-    output_lines(raw_text_lines, capture)
-if filetype == "bmo_bank":
-    # checking
-    transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
-elif filetype == "bmo_card":
-    # master card
-    transaction_lines = roll_up_card_transactions(raw_text_lines)
-elif filetype == "rbc_bank":
-    # checking
-    transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
-elif filetype == "rbc_card":
-    # master card
-    transaction_lines = roll_up_card_transactions(raw_text_lines)
+def process():
+    input, filetype, output, capture, input_format = get_run_params()
+    transaction_lines = []
+    if input_format == "pdf":
+        raw_text_lines = get_raw_text_lines_mupdf(input)
+    else:
+        raw_text_lines = get_raw_text_lines_cap(input)
+    if capture:
+        output_lines(raw_text_lines, capture)
+    if filetype == "bmo_bank":
+        # checking
+        transaction_lines = roll_up_bmo_bank_transactions(raw_text_lines)
+    elif filetype == "bmo_card":
+        # master card
+        transaction_lines = roll_up_card_transactions(raw_text_lines)
+    elif filetype == "rbc_bank":
+        # checking
+        transaction_lines = roll_up_rbc_bank_transactions(raw_text_lines)
+    elif filetype == "rbc_card":
+        # master card
+        transaction_lines = roll_up_card_transactions(raw_text_lines)
 
-output_lines(transaction_lines, output)
+    output_lines(transaction_lines, output)
+
+
+if __name__ == "__main__":
+    process()

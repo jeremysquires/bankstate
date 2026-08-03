@@ -27,21 +27,49 @@ def is_format_date(string, format):
         return False
 
 
-def dd_mon_to_mon_dd_date(string):
+def is_two_part_date(string):
+    return (
+        is_mon_dot_dd_date(string) or is_mon_dd_date(string) or is_dd_mon_date(string)
+    )
+
+
+def switch_two_part_date(string):
     date_part = string.split(" ")
     return f"{date_part[1]} {date_part[0]}"
 
 
+def normalize_mon_dd(string):
+    if len(string) < 4:
+        return string
+    return string[0] + string[1:3].lower() + string[3:]
+
+
+def normalize_dd_mon(string):
+    if len(string) < 2:
+        return string
+    return string[0:-2] + string[-2:].lower()
+
+
 def is_mon_dd_date(string):
-    return is_format_date(string, "%b %d")
+    return is_format_date(normalize_mon_dd(string), "%b %d")
 
 
 def is_dd_mon_date(string):
-    return is_format_date(string, "%d %b")
+    return is_format_date(normalize_dd_mon(string), "%d %b")
 
 
 def is_mon_dot_dd_date(string):
-    return is_format_date(string, "%b. %d")
+    return is_format_date(normalize_mon_dd(string), "%b. %d")
+
+
+def normalize_to_dd_mon(string):
+    dd_mon = None
+    string = string.replace(".", "")
+    if is_mon_dd_date(string):
+        dd_mon = switch_two_part_date(normalize_mon_dd(string))
+    else:
+        dd_mon = normalize_dd_mon(string)
+    return dd_mon
 
 
 def is_transaction_line(string):
