@@ -97,7 +97,7 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
     parts = []
     end_year = None
     end_month = None
-    last_month = None
+    previous_month = None
     year = None
     date_line_prefix = "For the period ending "
     for text_line in text_lines:
@@ -112,13 +112,13 @@ def roll_up_bmo_bank_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             dd_mon = utils.normalize_to_dd_mon(text_line)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
-            if last_month and last_month > entry_datetime.month:
+            if previous_month and previous_month > entry_datetime.month:
                 year = year + 1
-            elif not last_month and end_month < entry_datetime.month:
+            elif not previous_month and end_month < entry_datetime.month:
                 year = end_year - 1
-            elif not last_month and end_month >= entry_datetime.month:
+            elif not previous_month and end_month >= entry_datetime.month:
                 year = end_year
-            last_month = entry_datetime.month
+            previous_month = entry_datetime.month
             roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
@@ -163,7 +163,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     parts = []
     days_entries = []
     year = None
-    last_month = None
+    previous_month = None
     date_line_prefix = "Your opening balance on "
     for text_line in text_lines:
         if date_line_prefix in text_line:
@@ -171,7 +171,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             entry_date_string = text_line.split(date_line_prefix)[1]
             entry_datetime = datetime.strptime(entry_date_string, "%B %d, %Y")
             year = entry_datetime.year
-            last_month = entry_datetime.month
+            previous_month = entry_datetime.month
         text_line = text_line.replace("\t", " ")
         if text_line == "Opening Balance":
             in_balance = True
@@ -188,9 +188,9 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
             days_entries = []
             dd_mon = utils.normalize_to_dd_mon(text_line)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
-            if last_month > entry_datetime.month:
+            if previous_month > entry_datetime.month:
                 year = year + 1
-                last_month = entry_datetime.month
+                previous_month = entry_datetime.month
             current_date = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
@@ -261,7 +261,7 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     end_year = None
     end_month = None
     year = None
-    last_month = None
+    previous_month = None
     for text_line in text_lines:
         if "New Balance, " in text_line:
             # BMO MC
@@ -281,13 +281,13 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             field_number = 0
             dd_mon = utils.normalize_to_dd_mon(text_line)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
-            if last_month and last_month > entry_datetime.month:
+            if previous_month and previous_month > entry_datetime.month:
                 year = year + 1
-            elif not last_month and end_month < entry_datetime.month:
+            elif not previous_month and end_month < entry_datetime.month:
                 year = end_year - 1
-            elif not last_month and end_month >= entry_datetime.month:
+            elif not previous_month and end_month >= entry_datetime.month:
                 year = end_year
-            last_month = entry_datetime.month
+            previous_month = entry_datetime.month
             roll_up = f"{dd_mon} {year}"
         elif in_rollup:
             field_number += 1
