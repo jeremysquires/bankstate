@@ -154,6 +154,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
     roll_up = ""
     in_rollup = False
     in_balance = False
+    in_date = False
     field_number = 0
     initial_balance = 0.0
     current_balance = 0.0
@@ -176,13 +177,16 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
         if text_line == "Opening Balance":
             in_balance = True
             in_rollup = False
+            in_date = False
         elif in_balance:
             initial_balance = float(text_line.replace(",", "").replace("$", ""))
             in_balance = False
             in_rollup = False
+            in_date = False
         elif utils.is_dd_mon_date(text_line):
             in_rollup = True
             in_balance = False
+            in_date = True
             field_number = 0
             roll_up = ""
             days_entries = []
@@ -192,7 +196,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                 year = year + 1
                 previous_month = entry_datetime.month
             current_date = f"{dd_mon} {year}"
-        elif in_rollup:
+        elif in_rollup or in_date:
             field_number += 1
             if field_number == 1:
                 roll_up = f"{current_date}\t{text_line}"
@@ -212,20 +216,27 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                 partial_balance = 0.0
                 for day_entry in days_entries:
                     parts = day_entry.split("\t")
+                    value = float(parts[2].replace(",", ""))
                     # no way to determine if it is a + or -
                     # use text to identify common deposits
                     if (
                         "Deposit" in parts[1]
                         or "rebate" in parts[1]
                         or "redemption" in parts[1]
+                        or "received" in parts[1]
                     ):
-                        partial_balance += float(parts[2].replace(",", ""))
+                        partial_balance += value
                         parts.insert(2, "")
                     else:
                         # all others are assumed withdrawals
-                        partial_balance -= float(parts[2].replace(",", ""))
+                        partial_balance -= value
                         parts.insert(3, "")
-                    roll_up_lines.append("\t".join(utils.trim_parts(parts)))
+                    appendit = (
+                        "\t".join(utils.trim_parts(parts))
+                        + "\t"
+                        + "{:,.2f}".format(initial_balance + partial_balance)
+                    )
+                    roll_up_lines.append(appendit)
                     days_entries = []
                 roll_up = f"{roll_up}\t{text_line}"
                 in_rollup = False

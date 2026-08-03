@@ -200,5 +200,116 @@ class TestParser(unittest.TestCase):
         )
 
 
+    def test_received_etransfers_rbc_bank(self):
+        date_lines = [
+            "Your opening balance on December 20, 2024",
+            "Opening Balance",
+            "11,000.00",
+            "31 Dec",
+            "Online Banking transfer - 5555",
+            "ADDITIONAL_ID",
+            "1,000.00",
+            "10,000.00",
+            "1 Jan",
+            "e-Transfer sent BUCKS FOR YOU",
+            "300.00",
+            "9,700.00",
+            "5 Jan",
+            "e-Transfer received Friend of a Friend",
+            "FriendID",
+            "200.00",
+            "9,900.00",
+            "6 Jan",
+            "e-Transfer sent MORE BUCKS FOR YOU",
+            "700.00",
+            "9,200.00",
+        ]
+        result_lines = roll_up_rbc_bank_transactions(date_lines)
+        balances = [result_line.split('\t')[4] for result_line in result_lines]
+        descriptions = [result_line.split('\t')[1] for result_line in result_lines]
+        self.assertEqual(
+            len(result_lines), 5
+        )
+        self.assertListEqual(
+            balances, ["Balance","10,000.00","9,700.00","9,900.00","9,200.00"]
+        )
+        self.assertFalse(
+            any([bool("ERR:BALANCE" in description) for description in descriptions])
+        )
+
+
+    def test_undated_rows_rbc_bank(self):
+        date_lines = [
+            "Your opening balance on December 20, 2024",
+            "Opening Balance",
+            "11,000.00",
+            "31 Dec",
+            "Online Banking transfer - 5555",
+            "ADDITIONAL_ID",
+            "1,000.00",
+            "10,000.00",
+            "1 Jan",
+            "e-Transfer sent BUCKS FOR YOU",
+            "300.00",
+            "9,700.00",
+            "e-Transfer received Friend of a Friend",
+            "FriendID",
+            "200.00",
+            "9,900.00",
+            "6 Jan",
+            "e-Transfer sent MORE BUCKS FOR YOU",
+            "700.00",
+            "9,200.00",
+        ]
+        result_lines = roll_up_rbc_bank_transactions(date_lines)
+        balances = [result_line.split('\t')[4] for result_line in result_lines]
+        descriptions = [result_line.split('\t')[1] for result_line in result_lines]
+        self.assertEqual(
+            len(result_lines), 5
+        )
+        self.assertListEqual(
+            balances, ["Balance","10,000.00","9,700.00","9,900.00","9,200.00"]
+        )
+        self.assertFalse(
+            any([bool("ERR:BALANCE" in description) for description in descriptions])
+        )
+
+
+    def test_skip_balance_rbc_bank(self):
+        date_lines = [
+            "Your opening balance on December 20, 2024",
+            "Opening Balance",
+            "11,000.00",
+            "31 Dec",
+            "Online Banking transfer - 5555",
+            "ADDITIONAL_ID",
+            "1,000.00",
+            "10,000.00",
+            "1 Jan",
+            "e-Transfer received BUCKS FOR YOU",
+            "300.00",
+            "e-Transfer received Friend of a Friend",
+            "FriendID",
+            "200.00",
+            "10,500.00",
+            "6 Jan",
+            "e-Transfer sent MORE BUCKS FOR YOU",
+            "700.00",
+            "11,200.00",
+        ]
+        result_lines = roll_up_rbc_bank_transactions(date_lines)
+        balances = [result_line.split('\t')[4] for result_line in result_lines]
+        descriptions = [result_line.split('\t')[1] for result_line in result_lines]
+        self.assertEqual(
+            len(result_lines), 5
+        )
+        self.assertListEqual(
+            balances, ["Balance","10,000.00","10,300.00","10,500.00","11,200.00"]
+        )
+        self.assertFalse(
+            any([bool("ERR:BALANCE" in description) for description in descriptions])
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

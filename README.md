@@ -16,18 +16,12 @@ pdf2txt.py
 
 Reads PDF bank and mastercard statements and directly outputs a CSV format that can be imported into home finance software
 
-stmt2csv.py
-
-Converts text copied from PDF bank statements into a CSV or TSV format that can be imported into home finance software
+The stmt2csv.py script has been removed, but there is an option to import raw text capture files `--format cap` instead of PDFs, so it is possible to create the input files from any source by copying and pasting or exporting the text and manipulating it to fit one of the capture formats.
 
 ## Supported Data Formats
 
 * Bank of Montreal (BMO) bank account and credit card statements in PDF format
 * Royal Bank of Canada (RBC) bank account and credit card statements in PDF format
-
-Input to the stmt2csv.py script is manually copy/pasted from PDF files, so it is technically possible to create the input files from any source.
-
-Since pdf2txt.py reads the PDF directly, it is the preferred method, requiring less manual intervention. However, in cases where the format of the PDFs change or are sourced from other banks, the manual copy method can still be used.
 
 Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> and contain columns that in general match the input files, but with some cleanups to make import easier. Generated TSV files replace commas for tabs, which is useful when fields often contain commas.
 
@@ -35,7 +29,7 @@ Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> an
 
 ### Requirements
 
-* Python 3.8
+* Python 3.9
 * pipenv
 
 ### Process
@@ -96,154 +90,6 @@ For HomeBank users:
 2. Export as QIF
 3. Import into HomeBank
    * HomeBank has their own CSV format, but MMEX can handle arbitrary CSV formats.
-
-## stmt2csv.py
-
-### Requirements
-
-* Python 3.8
-* pipenv
-
-### Process
-
-```bash
-git clone git@github.com:jeremysquires/bankstate.git
-cd bankstate
-pipenv install --dev
-pipenv shell
-# Prepare input text using the correct `Text Copy` procedure
-python stmt2csv.py bankstatement.txt > output.csv
-```
-
-* Open CSV in LibreOffice/Excel to verify it has the correct structure
-* Import Into Budgeting Software
-
-### BMO MC Statement Text Copy
-
-Input Data Format:
-
-* The first line of the file gives the column headers for the CSV
-* ASSUMES column header values do not contain spaces themselves
-* Blank lines separate sections
-  * EXCEPT no blank line between the header and the first section
-* Each section corresponds to one column in the target CSV
-* A group of sections corresponding to the column headers is called a block
-* Credit card entries reverse the sign for amounts, credits are negative
-* Checking entries have the expected sign for amounts, debits are negative
-* Amounts use period (.) for the decimal separator
-* Dollar signs ($) and thousands separators (,) are ignored
-
-Algorithm:
-
-* For each section, read lines into a list of values associated with a column
-* Each subsequent section goes into the next column list until the last
-* Convert dates from Mon Day YYYY to YYYY-MM-DD
-* Clean up dollar values, sign of credits and other punctuation inconsistencies
-
-Manual Data Manipulation:
-
-* Paste header into empty file
-  * TRANSDATE POSTINGDATE PAYEE REFERENCENO AMOUNT
-* Open PDF in Evince or Okular
-  * Acrobat Reader does not work because of restricted permissions to copy
-* Copy each column one at a time into a separate section in the file
-* If the file is protected by DRM, use Okular to export to text
-
-Example copied text:
-
-```
-Jan. 15
-Jan. 15
-
-Jan. 16
-Jan. 16
-
-CO-OP GROCERY TOWN
-IO
-HOME STAR DINER
-TOWN
-IO
-
-800178830919
-800129277947
-
-108.64
-44.93
-```
-
-* If a value ends in CR, then it is a credit (remove CR, set sign to negative)
-* Values that have a comma in them should have them removed
-* Bring the Payee entries onto a single line
-
-```
-CO-OP GROCERY TOWN IO
-HOME STAR DINER TOWN IO
-```
-
-Occasionally payees/reference numbers will get mixed up .. fix these
-
-Add YYYY to the end of the dates
-
-```
-Jan. 15 2017
-Jan. 15 2017
-
-Jan. 16 2017
-Jan. 16 2017
-```
-
-Assume:
-
-* Each section has the same number of values as all other sections in block
-
-### BMO Checking Statement Text Copy
-
-Are similar to BMO MC Statements, only they only have 3 columns
-
-Date Payee Amount
-
-Similar manual fixes have to be implemented and the BMO MC code should work
-
-### RBC MC Statement Text Copy
-
-* The first line of the file gives the column headers for the CSV
-* Assumes column header values do not contain tabs themselves
-* Each line has an entire record, tab separated
-* Dates are in MON DD YYYY format
-* Currency is in -$1,111.11 format
-
-Algorithm:
-
-* Convert dates to YYYY-MM-DD
-* Convert currency to -1111.11 format
-* Convert tabs to commas, if a comma is in the field, add double quotes
-
-Manual Data Manipulation:
-
-* Use Adobe Acrobat Reader
-* Paste header into empty file (note tab separation)
-  * TRANSDATE	POSTINGDATE	PAYEE	REFERENCENO	AMOUNT
-* Copy all lines in a block of text into the file
-
-Example:
-
-```
-AUG 10 AUG 11 RIVER NATURAL PARK TOWN IO
-55134426223800174862247
-$37.66
-AUG 12 AUG 15 AIRLINE 883826008065855 TOWN IO
-55503806227004023214302
-$36.75
-```
-
-* Change spaces to tabs
-* Add YYYY to dates
-* Occasionally, a reference number will need to be added - add any number 0000
-
-```
-AUG 10 2016	AUG 11 2016	RIVER NATURAL PARK TOWN IO	55134426223800174862247	$37.66
-AUG 12 2016	AUG 15 2016	AIRLINE 883826008065855 TOWN IO	55503806227004023214302	$36.75
-```
 
 ## Tests
 
