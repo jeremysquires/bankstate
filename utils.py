@@ -38,12 +38,14 @@ def switch_two_part_date(string):
     return f"{date_part[1]} {date_part[0]}"
 
 
+# NOTE: this does not check for longer strings
 def normalize_mon_dd(string):
     if len(string) < 4:
-        return string
+        return ""
     return string[0] + string[1:3].lower() + string[3:]
 
 
+# NOTE: this does not check for longer strings
 def normalize_dd_mon(string):
     if len(string) < 2:
         return string
@@ -60,6 +62,13 @@ def is_dd_mon_date(string):
 
 def is_mon_dot_dd_date(string):
     return is_format_date(normalize_mon_dd(string), "%b. %d")
+
+
+def normalize_to_mon_dd_yyyy(string):
+    if len(string) < 4:
+        return ""
+    string = string.replace(".", "")
+    return string[0] + string[1:3].lower() + string[3:]
 
 
 def normalize_to_dd_mon(string):
@@ -116,3 +125,18 @@ def trim_parts(parts: List[str]) -> List[str]:
         part if len(part) < MAX_FIELD_LENGTH else " ".join(part.split(" ")[-2:])
         for part in parts
     ]
+
+
+def normalize_date_range(string):
+    # variants on Mon dd, yyyy TO/- Mon dd, yyyy
+    from_date, to_date = tuple(string.split("TO") if "TO" in string else (string.split("-") if "-" in string else [None, None]))
+    if not from_date or not to_date:
+        return None, None
+    from_date = normalize_to_mon_dd_yyyy(from_date.strip())
+    to_date = normalize_to_mon_dd_yyyy(to_date.strip())
+    # fix the missing yyyy in some date ranges 
+    if is_mon_dd_date(from_date) and is_format_date(to_date, "%b %d, %Y"):
+        from_date = from_date + f", {to_date[-4:]}"
+    if is_format_date(from_date, "%b %d, %Y") and is_format_date(to_date, "%b %d, %Y"):
+        return from_date, to_date
+    return None, None

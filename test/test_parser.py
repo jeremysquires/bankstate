@@ -132,7 +132,7 @@ class TestParser(unittest.TestCase):
 
     def test_date_change_bmo_card(self):
         date_lines = [
-            "New Balance, Jan. 6, 2024",
+            "Dec. 17, 2023 - Jan. 6, 2024",
             "Dec. 17",
             "Dec. 17",
             "Membership",
