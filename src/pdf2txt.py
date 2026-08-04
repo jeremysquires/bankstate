@@ -309,6 +309,8 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
                 if len(f1_parts) > 2:
                     f1_description = " ".join(f1_parts[2:])
                     roll_up = f"{roll_up}\t{f1_description}"
+                    # already added a tab, so increment field
+                    field_number = 2
             elif utils.is_int(text_line):
                 # reference number
                 roll_up = f"{roll_up} {text_line}"
