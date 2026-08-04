@@ -200,6 +200,39 @@ class TestParser(unittest.TestCase):
         )
 
 
+    def test_date_and_description_rbc_card(self):
+        date_lines = [
+            "STATEMENT FROM DEC 17, 2025 TO JAN 6, 2026",
+            "DEC 17",
+            "DEC 17",
+            "Membership",
+            "MyMembership",
+            "3298749847539874",
+            "100.00",
+            "JAN 1",
+            "JAN 3 Food Court City Province",
+            "9808938408093",
+            "30.00",
+            "JAN 4",
+            "JAN 6",
+            "GAS GAS GAS",
+            "100.00"
+        ]
+        result_lines = roll_up_card_transactions(date_lines)
+        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
+        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
+        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        self.assertEqual(
+            start_year, "2025"
+        )
+        self.assertEqual(
+            end_year, "2026"
+        )
+        self.assertEqual(
+            continue_year, "2026"
+        )
+
+
     def test_received_etransfers_rbc_bank(self):
         date_lines = [
             "Your opening balance on December 20, 2024",
