@@ -142,5 +142,15 @@ class TestUtils(unittest.TestCase):
            utils.normalize_to_dd_mon(test_string), "3 Dec"
         )
 
+    def test_normalize_date_range(self):
+        test_string = "Dec. 16, 2021 - Jan. 15, 2022"
+        self.assertTupleEqual(
+           utils.normalize_date_range(test_string), ("Dec 16, 2021", "Jan 15, 2022")
+        )
+        test_string = "MAR 11 TO APR 9, 2025"
+        self.assertTupleEqual(
+           utils.normalize_date_range(test_string), ("Mar 11, 2025", "Apr 9, 2025")
+        )
+
 if __name__ == "__main__":
     unittest.main()

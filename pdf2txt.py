@@ -273,21 +273,17 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     end_month = None
     year = None
     previous_month = None
+    date_range_string = None
     for text_line in text_lines:
-        if text_line.startswith("New Balance, "):
-            # BMO MC
-            end_date_string = text_line.split("New Balance, ")[1]
-            end_datetime = datetime.strptime(end_date_string, "%b. %d, %Y")
-            end_year = end_datetime.year
-            end_month = end_datetime.month
-        elif text_line.startswith("STATEMENT FROM"):
+        if text_line.startswith("STATEMENT FROM"):
             # RBC MC
-            end_date_string = text_line[
-                -12:
-            ]  # TODO: use regex so no strip and do not abuse mon dd norm
-            end_datetime = datetime.strptime(
-                utils.normalize_mon_dd(end_date_string.strip()), "%b %d, %Y"
-            )
+            date_range_string = text_line.split("STATEMENT FROM ")[1]
+        elif len(dr_parts := text_line.split(" ")) == 7 and "-" == dr_parts[3]:
+            # BMO MC
+            date_range_string = text_line
+        if date_range_string:
+            _, end_date_string = utils.normalize_date_range(date_range_string)
+            end_datetime = datetime.strptime(end_date_string, "%b %d, %Y")
             end_year = end_datetime.year
             end_month = end_datetime.month
         text_line = text_line.replace("\t", " ")
