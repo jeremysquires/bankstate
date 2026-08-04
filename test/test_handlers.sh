@@ -23,35 +23,36 @@
 
 CWD=$(pwd)
 
-if [ -f ../pdf2txt.py ]; then
+if [ -f ../src/pdf2txt.py ]; then
   cd ..
   if [ -d ./test/data/new ]; then
     rm -Rf ./test/data/new
   fi
 fi
 mkdir -p ./test/data/new
+cd src
 
 # test_bmo_bank
-pipenv run python pdf2txt.py ./test/data/input/bmo_bank.pdf bmo_bank ./test/data/new/bmo_bank.tsv -c ./test/data/raw/bmo_bank.txt
+pipenv run python pdf2txt.py ../test/data/input/bmo_bank.pdf bmo_bank ../test/data/new/bmo_bank.tsv -c ../test/data/raw/bmo_bank.txt
 # test_bmo_card
-pipenv run python pdf2txt.py ./test/data/input/bmo_card.pdf bmo_card ./test/data/new/bmo_card.tsv -c ./test/data/raw/bmo_card.txt
+pipenv run python pdf2txt.py ../test/data/input/bmo_card.pdf bmo_card ../test/data/new/bmo_card.tsv -c ../test/data/raw/bmo_card.txt
 # test_bmo_card2
-pipenv run python pdf2txt.py ./test/data/input/bmo_card2.pdf bmo_card ./test/data/new/bmo_card2.tsv -c ./test/data/raw/bmo_card2.txt
+pipenv run python pdf2txt.py ../test/data/input/bmo_card2.pdf bmo_card ../test/data/new/bmo_card2.tsv -c ../test/data/raw/bmo_card2.txt
 # test_rbc_bank
-pipenv run python pdf2txt.py ./test/data/input/rbc_bank.pdf rbc_bank ./test/data/new/rbc_bank.tsv -c ./test/data/raw/rbc_bank.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_bank.pdf rbc_bank ../test/data/new/rbc_bank.tsv -c ../test/data/raw/rbc_bank.txt
 # test_rbc_bank2
-pipenv run python pdf2txt.py ./test/data/input/rbc_bank2.pdf rbc_bank ./test/data/new/rbc_bank2.tsv -c ./test/data/raw/rbc_bank2.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_bank2.pdf rbc_bank ../test/data/new/rbc_bank2.tsv -c ../test/data/raw/rbc_bank2.txt
 # test_rbc_bank_2023
-pipenv run python pdf2txt.py ./test/data/input/rbc_bank_2023.pdf rbc_bank ./test/data/new/rbc_bank_2023.tsv -c ./test/data/raw/rbc_bank_2023.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_bank_2023.pdf rbc_bank ../test/data/new/rbc_bank_2023.tsv -c ../test/data/raw/rbc_bank_2023.txt
 # test_rbc_bank_2025
-pipenv run python pdf2txt.py ./test/data/input/rbc_bank_2025.pdf rbc_bank ./test/data/new/rbc_bank_2025.tsv -c ./test/data/raw/rbc_bank_2025.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_bank_2025.pdf rbc_bank ../test/data/new/rbc_bank_2025.tsv -c ../test/data/raw/rbc_bank_2025.txt
 # test_rbc_card
-pipenv run python pdf2txt.py ./test/data/input/rbc_card.pdf rbc_card ./test/data/new/rbc_card.tsv -c ./test/data/raw/rbc_card.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_card.pdf rbc_card ../test/data/new/rbc_card.tsv -c ../test/data/raw/rbc_card.txt
 # test_rbc_card_2026
-pipenv run python pdf2txt.py ./test/data/input/rbc_card_2026.pdf rbc_card ./test/data/new/rbc_card_2026.tsv -c ./test/data/raw/rbc_card_2026.txt
+pipenv run python pdf2txt.py ../test/data/input/rbc_card_2026.pdf rbc_card ../test/data/new/rbc_card_2026.tsv -c ../test/data/raw/rbc_card_2026.txt
 
 # check test output
-cd test/data
+cd ../test/data
 if [ -d ./orig ]; then
   diff orig new
 else
@@ -60,9 +61,9 @@ else
 fi
 
 # check processing raw input test_bmo_bank will result in the same output (don't need to check all of them)
-cd ../..
-pipenv run python pdf2txt.py ./test/data/raw/bmo_bank.txt bmo_bank ./test/data/new/bmo_bank.tsv -f cap
-cd test/data
+cd ../../src
+pipenv run python pdf2txt.py ../test/data/raw/bmo_bank.txt bmo_bank ../test/data/new/bmo_bank.tsv -f cap
+cd ../test/data
 diff orig new
 
 cd $CWD

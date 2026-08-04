@@ -2,7 +2,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 import utils
 
 
@@ -76,81 +76,52 @@ class TestUtils(unittest.TestCase):
             "\t".join(utils.trim_parts(long_strings.split("\t"))), desired_long_strings
         )
 
-
     def test_normalize_mon_dd_zero_pad(self):
         capsmon = "DEC 03"
-        self.assertEqual(
-           utils.normalize_mon_dd(capsmon), "Dec 03"
-        )
-
+        self.assertEqual(utils.normalize_mon_dd(capsmon), "Dec 03")
 
     def test_normalize_mon_dd_no_pad(self):
         capsmon = "DEC 3"
-        self.assertEqual(
-           utils.normalize_mon_dd(capsmon), "Dec 3"
-        )
-
+        self.assertEqual(utils.normalize_mon_dd(capsmon), "Dec 3")
 
     def test_normalize_mon_dot_dd_no_pad(self):
         capsmon = "DEC. 3"
-        self.assertEqual(
-           utils.normalize_mon_dd(capsmon), "Dec. 3"
-        )
-
+        self.assertEqual(utils.normalize_mon_dd(capsmon), "Dec. 3")
 
     def test_normalize_dd_mon_zero_pad(self):
         capsmon = "03 DEC"
-        self.assertEqual(
-           utils.normalize_dd_mon(capsmon), "03 Dec"
-        )
-
+        self.assertEqual(utils.normalize_dd_mon(capsmon), "03 Dec")
 
     def test_normalize_dd_mon_no_pad(self):
         capsmon = "3 DEC"
-        self.assertEqual(
-           utils.normalize_dd_mon(capsmon), "3 Dec"
-        )
-
+        self.assertEqual(utils.normalize_dd_mon(capsmon), "3 Dec")
 
     def test_normalize_to_dd_mon(self):
         test_string = "3 DEC"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "3 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "3 Dec")
         test_string = "03 DEC"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "03 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "03 Dec")
         test_string = "DEC 3"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "3 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "3 Dec")
         test_string = "DEC 03"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "03 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "03 Dec")
         test_string = "DEC. 03"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "03 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "03 Dec")
         test_string = "Dec 03"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "03 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "03 Dec")
         test_string = "Dec 3"
-        self.assertEqual(
-           utils.normalize_to_dd_mon(test_string), "3 Dec"
-        )
+        self.assertEqual(utils.normalize_to_dd_mon(test_string), "3 Dec")
 
     def test_normalize_date_range(self):
         test_string = "Dec. 16, 2021 - Jan. 15, 2022"
         self.assertTupleEqual(
-           utils.normalize_date_range(test_string), ("Dec 16, 2021", "Jan 15, 2022")
+            utils.normalize_date_range(test_string), ("Dec 16, 2021", "Jan 15, 2022")
         )
         test_string = "MAR 11 TO APR 9, 2025"
         self.assertTupleEqual(
-           utils.normalize_date_range(test_string), ("Mar 11, 2025", "Apr 9, 2025")
+            utils.normalize_date_range(test_string), ("Mar 11, 2025", "Apr 9, 2025")
         )
+
 
 if __name__ == "__main__":
     unittest.main()
