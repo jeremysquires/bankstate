@@ -219,17 +219,12 @@ class TestParser(unittest.TestCase):
             "100.00"
         ]
         result_lines = roll_up_card_transactions(date_lines)
-        start_year = (result_lines[1].split('\t')[0].split(' '))[2]
-        end_year = (result_lines[2].split('\t')[0].split(' '))[2]
-        continue_year = (result_lines[3].split('\t')[0].split(' '))[2]
+        descriptions = [result_line.split('\t')[1] for result_line in result_lines]
         self.assertEqual(
-            start_year, "2025"
+            len(result_lines), 4
         )
-        self.assertEqual(
-            end_year, "2026"
-        )
-        self.assertEqual(
-            continue_year, "2026"
+        self.assertListEqual(
+            descriptions, ["Description","Membership MyMembership 3298749847539874","Food Court City Province 9808938408093","GAS GAS GAS"]
         )
 
 
