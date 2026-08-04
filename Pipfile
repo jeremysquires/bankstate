@@ -13,8 +13,8 @@ black = "*"
 pylint = "*"
 
 [scripts]
-format = "black *.py"
-lint = "pylint ."
+format = "black src/*.py test/*.py"
+lint = "pylint ./src ./test"
 test = "python -m unittest discover -s test -v"
 test_handlers = "bash ./test/test_handlers.sh"
 

@@ -304,10 +304,14 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
         elif in_rollup:
             field_number += 1
             if field_number == 1:
-                pass
+                # posted date, not interesting, but check if description is appended
+                f1_parts = text_line.split(" ")
+                if len(f1_parts) > 2:
+                    f1_description = " ".join(f1_parts[2:])
+                    roll_up = f"{roll_up}\t{f1_description}"
             elif utils.is_int(text_line):
-                # reference number: roll_up = f"{roll_up}\t{text_line}"
-                pass
+                # reference number
+                roll_up = f"{roll_up} {text_line}"
             elif utils.is_currency(text_line):
                 text_line = text_line.replace(",", "").replace("$", "")
                 if text_line.startswith("-"):

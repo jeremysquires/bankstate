@@ -129,12 +129,16 @@ def trim_parts(parts: List[str]) -> List[str]:
 
 def normalize_date_range(string):
     # variants on Mon dd, yyyy TO/- Mon dd, yyyy
-    from_date, to_date = tuple(string.split("TO") if "TO" in string else (string.split("-") if "-" in string else [None, None]))
+    from_date, to_date = tuple(
+        string.split("TO")
+        if "TO" in string
+        else (string.split("-") if "-" in string else [None, None])
+    )
     if not from_date or not to_date:
         return None, None
     from_date = normalize_to_mon_dd_yyyy(from_date.strip())
     to_date = normalize_to_mon_dd_yyyy(to_date.strip())
-    # fix the missing yyyy in some date ranges 
+    # fix the missing yyyy in some date ranges
     if is_mon_dd_date(from_date) and is_format_date(to_date, "%b %d, %Y"):
         from_date = from_date + f", {to_date[-4:]}"
     if is_format_date(from_date, "%b %d, %Y") and is_format_date(to_date, "%b %d, %Y"):
