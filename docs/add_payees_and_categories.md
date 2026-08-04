@@ -30,4 +30,22 @@ All the following should not include the category of transaction prefix in the P
 INTERAC e-Transfer Sent Neighborhood Lawn Care
 Online Bill Payment, POWER COMPANY
 Direct Deposit, JOB INC. PAY/PAY
-````
+```
+
+## Plan
+
+* merge csvs: take a list of csvs and merge them into a single file with a single header for input
+  * use duckdb - load_csvs with wildcard, potential transform to common header, then export
+  * can use bash script as well - just omit all but the first header and cat all the rest of the files
+* extract payees: read csvs into tables, select the description column, process regex to give payee info only, save to new csvs
+  * use duckdb - using duckdb ui, craft the SQL, save it to file, then develop a duckdb SQL driver in Python to automate
+* create payees and categories: given a specific payee, apply a category
+  * prepare a fake import csv with the final payees and associated categories
+  * import the fake import
+  * add the regexes to pattern match payees on import (mmex feature)
+  * remove all the fake transations
+  * save as a template db
+* merge payees: if duplicate payees exist, then merge them
+  * mmex provides an import feature where regexes for payees will force them to be merged
+  * mmex provides a UI to merge payees after import
+  * alternatively: use dbeaver/duckdb to craft SQL to merge them (duckdb does not read mmex mmdb correctly)
