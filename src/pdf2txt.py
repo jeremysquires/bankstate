@@ -286,6 +286,7 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             end_datetime = datetime.strptime(end_date_string, "%b %d, %Y")
             end_year = end_datetime.year
             end_month = end_datetime.month
+            date_range_string = None
         text_line = text_line.replace("\t", " ")
         if not in_rollup and (utils.is_two_part_date(text_line)):
             in_rollup = True
