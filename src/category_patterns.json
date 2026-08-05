@@ -1,0 +1,11 @@
+{
+    "Transfer": " TF ",
+    "Salary": " PAY",
+    "Tax": "HST|GST|VAT|TAX",
+    "Service": "Monthly fee|MultiProduct Rebate|FULL PLAN FEE REBATE|PREMIUM PLAN",
+    "Insurance": "Insurance",
+    "Investment": "Invest|DIVIDEND",
+    "Cash": "Cash withdrawal|ABM",
+    "Internet": "COMM",
+    "Utilities": "POWER"
+}
