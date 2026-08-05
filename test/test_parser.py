@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
-from pdf2txt import (
+from src.pdf2txt import (
     roll_up_rbc_bank_transactions,
     roll_up_bmo_bank_transactions,
     roll_up_card_transactions,
