@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
-from src.payee_category import category_from_payee, payee_from_description
+from src.payee_category import category_from_description, payee_from_description
 
 
 class TestPayeeCategory(unittest.TestCase):
@@ -36,15 +36,14 @@ class TestPayeeCategory(unittest.TestCase):
             payee = payee_from_description(description)
             self.assertEqual(payee, payees[idx])
 
-
     def test_special_payee_from_description(self):
         descriptions = [
-            "Online Banking transfer - 1324",           # FAILED: "(\\w) - (\\w)",
-            "#930 MSHOPNAME           CITY1 PROVINCE1", # Special rule for MARK'S
-            "BOOKSTORE 123           CITY1",            # BOOKSTORE not implemented
-            "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",   # OTHERSHOP not implemented
-            "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",   # OTHERSHOP not implemented
-            "ONLINESTORE 12345678 WWW.STORE.COM",       # ONLINESTORE not implemented
+            "Online Banking transfer - 1324",  # FAILED: "(\\w) - (\\w)",
+            "#930 MSHOPNAME           CITY1 PROVINCE1",  # Special rule for MARK'S
+            "BOOKSTORE 123           CITY1",  # BOOKSTORE not implemented
+            "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
+            "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
+            "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE not implemented
         ]
         payees = [
             "- 1324",
@@ -57,6 +56,27 @@ class TestPayeeCategory(unittest.TestCase):
         for idx, description in enumerate(descriptions):
             payee = payee_from_description(description)
             self.assertEqual(payee, payees[idx])
+
+    def test_generic_category_from_description(self):
+        descriptions = [
+            "Payroll Deposit COMPANY",
+            "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+            "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+            "Online Bill Payment, POWER COMPANY",
+            "Direct Deposit, JOB INC. PAY/PAY",
+            "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+        ]
+        categories = [
+            "Salary",
+            "Tax",
+            "Landscaping",
+            "Utilities",
+            "Salary",
+            "Other",
+        ]
+        for idx, description in enumerate(descriptions):
+            category = category_from_description(description)
+            self.assertEqual(category, categories[idx])
 
 
 if __name__ == "__main__":

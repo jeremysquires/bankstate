@@ -11,6 +11,7 @@ import pathlib
 
 SCRIPT_DIR = pathlib.Path(__file__).parent.resolve()
 
+
 def get_run_params() -> Tuple[str, str, str]:
     parser = argparse.ArgumentParser(
         prog="payee_categoryt.py",
@@ -45,14 +46,14 @@ def get_run_params() -> Tuple[str, str, str]:
 
 
 def get_csv(filename: str) -> List[str]:
-    with open(filename, mode='r', encoding='utf-8') as file:
-        delimiter = ','
+    with open(filename, mode="r", encoding="utf-8") as file:
+        delimiter = ","
         if filename.endswith("tsv"):
-            delimiter = '\t'
+            delimiter = "\t"
         reader = csv.reader(file, delimiter=delimiter)
         rows = []
         for row in reader:
-            rows.append(row)    
+            rows.append(row)
     return rows
 
 
@@ -60,7 +61,7 @@ def get_csv(filename: str) -> List[str]:
 def get_category_patterns() -> dict[str, str]:
     # regex matches for specific payee patterns
     if os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
-        with open(f"{SCRIPT_DIR}/category_patterns.json", 'r') as file:
+        with open(f"{SCRIPT_DIR}/category_patterns.json", "r") as file:
             return json.load(file)
     return {
         "Transfer": " TF ",
@@ -71,13 +72,13 @@ def get_category_patterns() -> dict[str, str]:
         "Investment": "Investment",
         "Cash withdrawal": "Cash",
     }
-    
+
 
 @cache
 def get_payee_patterns() -> list[str]:
     # regex matches for specific payee patterns
     if os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
-        with open(f"{SCRIPT_DIR}/payee_patterns.json", 'r') as file:
+        with open(f"{SCRIPT_DIR}/payee_patterns.json", "r") as file:
             return json.load(file)
     return [
         "[\\*#]",
@@ -93,15 +94,17 @@ def get_payee_patterns() -> list[str]:
         "e-Transfer Sent ",
         "e-Transfer Received ",
         "ETRNSFR SENT ",
-        "ETRNSFR RECVD "
+        "ETRNSFR RECVD ",
     ]
 
 
-def category_from_payee(payee: str) -> str:
+def category_from_description(description: str) -> str:
     category_patterns = get_category_patterns()
     # TODO: if match multiple times, return most likely
     for key, value in category_patterns.items():
-        if re.match(value, payee, re.IGNORECASE):
+        p = re.compile(value, re.IGNORECASE)
+        if re.search(p, description):
+            print(f"{description} - {key}")
             return key
     return "Other"
 
@@ -116,23 +119,24 @@ def payee_from_description(description: str) -> str:
         return payee
     return "Unknown"
 
+
 def add_payee_and_category(rows: List[List[str]]) -> List[List[str]]:
     rows_added = [*(rows[0]), "Payee", "Category"]
     for row in rows[1:]:
         description = row[1]
         payee = payee_from_description(description)
-        category = category_from_payee(payee)
+        category = category_from_description(payee)
         rows_added.append([*row, payee, category])
     return rows_added
 
 
 def map_bmo_bank_transactions(rows: List[List[str]]) -> List[List[str]]:
-    roll_up_rows = [["Date","Description","Withdrawal","Deposit","Balance"]]
+    roll_up_rows = [["Date", "Description", "Withdrawal", "Deposit", "Balance"]]
     return roll_up_rows
 
 
 def map_scotia_visa_transactions(rows: List[List[str]]) -> List[List[str]]:
-    roll_up_rows = [["Date","Description","Withdrawal","Deposit","Balance"]]
+    roll_up_rows = [["Date", "Description", "Withdrawal", "Deposit", "Balance"]]
     return roll_up_rows
 
 
