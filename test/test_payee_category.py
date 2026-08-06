@@ -19,6 +19,7 @@ class TestPayeeCategory(unittest.TestCase):
             "INTERAC e-Transfer Sent Neighborhood Lawn Care",
             "Online Bill Payment, POWER COMPANY",
             "Direct Deposit, JOB INC. PAY/PAY",
+            "USD999.00@1.000000000 COMPANY PRODUCTS & SERVICES 123456789 AA",
         ]
         payees = [
             "COMPANY",
@@ -31,6 +32,7 @@ class TestPayeeCategory(unittest.TestCase):
             "Neighborhood Lawn Care",
             "POWER COMPANY",
             "JOB INC. PAY/PAY",
+            "COMPANY PRODUCTS & SERVICES 123456789 AA",
         ]
         for idx, description in enumerate(descriptions):
             payee = payee_from_description(description)
@@ -38,16 +40,24 @@ class TestPayeeCategory(unittest.TestCase):
 
     def test_special_payee_from_description(self):
         descriptions = [
-            "Online Banking transfer - 1324",  # FAILED: "(\\w) - (\\w)",
-            "#930 MSHOPNAME           CITY1 PROVINCE1",  # Special rule for MARK'S
+            "AMZN Mktp CA*J999B9K99 WWW.AMAZON.CAON",
+            "LinkedIn 6367341474     LINKEDIN.COM IRL",
+            "Amazon.ca*A99AA9A99        AMAZON.CA ON",
+            "SHELL C99999            CITY PROVINCE",
+            "#930 MARK'S           CITY1 PROVINCE1",  # Special rule for MARK'S
+            "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
             "BOOKSTORE 123           CITY1",  # BOOKSTORE not implemented
             "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
             "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
             "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE not implemented
         ]
         payees = [
+            "AMZN Mktp CA",
+            "LinkedIn",
+            "Amazon.ca",
+            "SHELL",
+            "MARK'S",
             "- 1324",
-            "MSHOPNAME",
             "BOOKSTORE 123",
             "OUTER ROAD OTHERSHOP",
             "INNER ROAD OTHERSHOP",
@@ -57,6 +67,27 @@ class TestPayeeCategory(unittest.TestCase):
             payee = payee_from_description(description)
             self.assertEqual(payee, payees[idx])
 
+
+    def test_malfunctioning_payee_from_description(self):
+        descriptions = [
+            "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
+            "BOOKSTORE 123           CITY1",  # BOOKSTORE not implemented
+            "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
+            "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
+            "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE not implemented
+        ]
+        payees = [
+            "- 1324",
+            "BOOKSTORE 123",
+            "OUTER ROAD OTHERSHOP",
+            "INNER ROAD OTHERSHOP",
+            "ONLINESTORE 12345678 WWW.STORE.COM",
+        ]
+        for idx, description in enumerate(descriptions):
+            payee = payee_from_description(description)
+            self.assertEqual(payee, payees[idx])
+
+
     def test_generic_category_from_description(self):
         descriptions = [
             "Payroll Deposit COMPANY",
@@ -65,6 +96,7 @@ class TestPayeeCategory(unittest.TestCase):
             "Online Bill Payment, POWER COMPANY",
             "Direct Deposit, JOB INC. PAY/PAY",
             "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+            "Online Bill Payment, COMMS COMPANY",
         ]
         categories = [
             "Salary",
@@ -73,6 +105,7 @@ class TestPayeeCategory(unittest.TestCase):
             "Utilities",
             "Salary",
             "Other",
+            "Internet",
         ]
         for idx, description in enumerate(descriptions):
             category = category_from_description(description)

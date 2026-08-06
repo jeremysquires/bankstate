@@ -104,7 +104,6 @@ def category_from_description(description: str) -> str:
     for key, value in category_patterns.items():
         p = re.compile(value, re.IGNORECASE)
         if re.search(p, description):
-            print(f"{description} - {key}")
             return key
     return "Other"
 

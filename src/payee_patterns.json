@@ -1,9 +1,9 @@
 [
-    "(LinkedIn)\\s+\\d+\\s+\\.*",
+    "(LinkedIn)\\s+\\d+\\s+.*",
     "(AMZN Mktp CA).*",
     "(Amazon\\.ca).*",
     "(AIRBNB).*",
-    "(SHELL) C?\\d+",
+    "(SHELL) C?\\d+.*",
     "USD\\d+\\.\\d+@\\d+\\.\\d+ ",
     "(\\w)\\s{5,}.+",
     "#\\s?\\d+\\s*[^M]*",
