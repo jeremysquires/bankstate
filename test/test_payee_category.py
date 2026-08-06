@@ -3,7 +3,11 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
-from src.payee_category import category_from_description, payee_from_description
+from src.payee_category import (
+    category_from_description,
+    payee_from_description,
+    map_bmo_bank_transactions,
+)
 
 
 class TestPayeeCategory(unittest.TestCase):
@@ -67,7 +71,6 @@ class TestPayeeCategory(unittest.TestCase):
             payee = payee_from_description(description)
             self.assertEqual(payee, payees[idx])
 
-
     def test_malfunctioning_payee_from_description(self):
         descriptions = [
             "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
@@ -86,7 +89,6 @@ class TestPayeeCategory(unittest.TestCase):
         for idx, description in enumerate(descriptions):
             payee = payee_from_description(description)
             self.assertEqual(payee, payees[idx])
-
 
     def test_generic_category_from_description(self):
         descriptions = [
@@ -110,6 +112,136 @@ class TestPayeeCategory(unittest.TestCase):
         for idx, description in enumerate(descriptions):
             category = category_from_description(description)
             self.assertEqual(category, categories[idx])
+
+    def test_map_bmo_bank_transactions(self):
+        rows_bmo_bank = [
+            [
+                "First Bank Card",
+                "Transaction Type",
+                "Date Posted",
+                "Transaction Amount",
+                "Description",
+            ],
+            ["111", "CREDIT", "20260101", 1000.00, "[DN]Payroll Deposit COMPANY"],
+            [
+                "111",
+                "DEBIT",
+                "20260101",
+                -1000.00,
+                "[CW]INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+            ],
+            [
+                "111",
+                "DEBIT",
+                "20260101",
+                -100.00,
+                "[CW]INTERAC e-Transfer Sent Neighborhood Lawn Care",
+            ],
+            [
+                "111",
+                "DEBIT",
+                "20260101",
+                -100.00,
+                "[CW]Online Bill Payment, POWER COMPANY",
+            ],
+            [
+                "111",
+                "CREDIT",
+                "20260101",
+                1000.00,
+                "[DN]Direct Deposit, JOB INC. PAY/PAY",
+            ],
+            [
+                "111",
+                "DEBIT",
+                "20260101",
+                -100.00,
+                "[CW]MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+            ],
+            [
+                "111",
+                "DEBIT",
+                "20260101",
+                -100.00,
+                "[CW]Online Bill Payment, COMMS COMPANY",
+            ],
+        ]
+        rows_expected = [
+            [
+                "Date",
+                "Description",
+                "Withdrawal",
+                "Deposit",
+                "Balance",
+                "Payee",
+                "Category",
+            ],
+            [
+                "01 Jan, 2026",
+                "Payroll Deposit COMPANY",
+                None,
+                1000.00,
+                2000.00,
+                "COMPANY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+                1000.00,
+                None,
+                1000.00,
+                "CITY TAX",
+                "Tax",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+                100,
+                None,
+                900.00,
+                "Neighborhood Lawn Care",
+                "Landscaping",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, POWER COMPANY",
+                100.00,
+                None,
+                800.00,
+                "POWER COMPANY",
+                "Utilities",
+            ],
+            [
+                "01 Jan, 2026",
+                "Direct Deposit, JOB INC. PAY/PAY",
+                None,
+                1000.00,
+                1800.00,
+                "JOB INC. PAY/PAY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                100.00,
+                None,
+                1700.00,
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                "Other",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, COMMS COMPANY",
+                100.00,
+                None,
+                1600.00,
+                "COMMS COMPANY",
+                "Internet",
+            ],
+        ]
+        rows_out = map_bmo_bank_transactions(rows_bmo_bank, 1000.00)
+        self.assertListEqual(rows_expected, rows_out)
 
 
 if __name__ == "__main__":

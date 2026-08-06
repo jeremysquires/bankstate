@@ -14,7 +14,7 @@ SCRIPT_DIR = pathlib.Path(__file__).parent.resolve()
 
 def get_run_params() -> Tuple[str, str, str]:
     parser = argparse.ArgumentParser(
-        prog="payee_categoryt.py",
+        prog="payee_category.py",
         description="Converts bank statement TSV/CSVs to a common format and adds payees and categories",
         epilog=(
             f"Copyright (C) 2026 Jeremy Squires <jms@mailforce.net> "
@@ -40,9 +40,15 @@ def get_run_params() -> Tuple[str, str, str]:
         "output",
         help=f"output is the path to the CSV output file",
     )
+    parser.add_argument(
+        "--balance",
+        "-b",
+        help=(f"balance before first transaction"),
+        default=None,
+    )
     args = parser.parse_args()
-    print(args.input, args.filetype, args.output, args.capture or "", args.format or "")
-    return args.input, args.filetype, args.output, args.capture or "", args.format or ""
+    print(args.input, args.filetype, args.output, args.balance or "")
+    return args.input, args.filetype, args.output, args.balance or ""
 
 
 def get_csv(filename: str) -> List[str]:
@@ -63,15 +69,7 @@ def get_category_patterns() -> dict[str, str]:
     if os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
         with open(f"{SCRIPT_DIR}/category_patterns.json", "r") as file:
             return json.load(file)
-    return {
-        "Transfer": " TF ",
-        "Salary": " PAY",
-        "Tax": "HST|GST|VAT",
-        "Service": "Monthly fee|MultiProduct Rebate|FULL PLAN FEE REBATE|PREMIUM PLAN",
-        "Insurance": "Insurance",
-        "Investment": "Investment",
-        "Cash withdrawal": "Cash",
-    }
+    return {}
 
 
 @cache
@@ -80,22 +78,7 @@ def get_payee_patterns() -> list[str]:
     if os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
         with open(f"{SCRIPT_DIR}/payee_patterns.json", "r") as file:
             return json.load(file)
-    return [
-        "[\\*#]",
-        "\\s\\d+\\s",
-        "Direct Deposit, ",
-        "Payroll Deposit ",
-        "Online ",
-        "Bill Payment",
-        "Banking transfer - ",
-        "Banking payment - ",
-        "Misc Payment ",
-        "INTERAC ",
-        "e-Transfer Sent ",
-        "e-Transfer Received ",
-        "ETRNSFR SENT ",
-        "ETRNSFR RECVD ",
-    ]
+    return []
 
 
 def category_from_description(description: str) -> str:
@@ -129,8 +112,41 @@ def add_payee_and_category(rows: List[List[str]]) -> List[List[str]]:
     return rows_added
 
 
-def map_bmo_bank_transactions(rows: List[List[str]]) -> List[List[str]]:
-    roll_up_rows = [["Date", "Description", "Withdrawal", "Deposit", "Balance"]]
+def map_header_to_indexes(row: list[str]) -> dict:
+    header_to_indexes = {}
+    for idx, header in enumerate(row):
+        header_to_indexes[header] = idx
+    return header_to_indexes
+
+
+def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
+    # "First Bank Card", "Transaction Type", "Date Posted", "Transaction Amount", Description
+    header_to_indexes = map_header_to_indexes(rows[0])
+    # remove [CW] transaction type prefixes from descriptions
+    p = re.compile(r"\[..\]")
+    roll_up_rows = [
+        ["Date", "Description", "Withdrawal", "Deposit", "Balance", "Payee", "Category"]
+    ]
+    for row in rows[1:]:
+        dateposted = datetime.strptime(
+            row[header_to_indexes["Date Posted"]], "%Y%m%d"
+        ).strftime("%d %b, %Y")
+        description = p.sub("", row[header_to_indexes["Description"]])
+        amount = row[header_to_indexes["Transaction Amount"]]
+        deposit = amount if amount >= 0.0 else None
+        withdrawal = -1.0 * amount if amount < 0.0 else None
+        balance = balance + amount if balance else None
+        roll_up_rows.append(
+            [
+                dateposted,
+                description,
+                withdrawal,
+                deposit,
+                balance,
+                payee_from_description(description),
+                category_from_description(description),
+            ]
+        )
     return roll_up_rows
 
 
@@ -146,14 +162,14 @@ def output_rows(rows: List[List[str]], output: str) -> None:
 
 
 def process():
-    input, filetype, output = get_run_params()
+    input, filetype, output, balance = get_run_params()
     rows = get_csv(input)
     if filetype == "bmo_bank":
         # bank
-        mapped_rows = map_bmo_bank_transactions(rows)
-    elif filetype == "scotia_visa":
+        mapped_rows = map_bmo_bank_transactions(rows, balance)
+    elif filetype == "sco_visa":
         # visa
-        mapped_rows = map_scotia_visa_transactions(rows)
+        mapped_rows = map_scotia_visa_transactions(rows, balance)
     else:
         # tsv input
         mapped_rows = rows
