@@ -15,7 +15,7 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
-      "args": ["./test/data/input/bmo_bank.pdf", "bmo_bank", "./test/data/new/bmo_bank.tsv"]
+      "args": ["../test/data/input/bmo_bank.pdf", "bmo_bank", "../test/data/new/bmo_bank.tsv"]
     },   
     {
       "name": "Python: bmo_card File",
@@ -25,7 +25,7 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
-      "args": ["./test/data/input/bmo_card.pdf", "bmo_card", "./test/data/new/bmo_card.tsv"]
+      "args": ["../test/data/input/bmo_card_2026.pdf", "bmo_card", "../test/data/new/bmo_card_2026.tsv"]
     },   
     {
       "name": "Python: rbc_bank File",
@@ -35,7 +35,7 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
-      "args": ["./test/data/input/rbc_bank.pdf", "rbc_bank", "./test/data/new/rbc_bank.tsv"]
+      "args": ["../test/data/input/rbc_bank.pdf", "rbc_bank", "../test/data/new/rbc_bank.tsv"]
     },   
     {
       "name": "Python: rbc_card File",
@@ -45,7 +45,7 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
-      "args": ["./test/data/input/rbc_card.pdf", "rbc_card", "./test/data/new/rbc_card.tsv"]
+      "args": ["../test/data/input/rbc_card.pdf", "rbc_card", "../test/data/new/rbc_card.tsv"]
     }    
   ]
 }
