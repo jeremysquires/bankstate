@@ -101,34 +101,6 @@ def payee_from_description(description: str) -> str:
     return "Unknown"
 
 
-def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
-    # header and data are already in desired format
-    # NOTE: credit cards do not have balance
-    # "Date", "Description", "Withdrawal", "Deposit", "Balance"
-    rows_added = [[*(rows[0]), "Payee", "Category"]]
-    # but the balance might be iffy, so keep a running total
-    calculated_balance = None
-    for row in rows[1:]:
-        description = row[1]
-        payee = payee_from_description(description)
-        category = category_from_description(description)
-        # and correct the balance if necessary
-        withdrawal = row[2]
-        deposit = row[3]
-        balance = row[4] if len(row) > 5 else None
-        if not calculated_balance:
-            # assume the first row's balance is ok
-            calculated_balance = balance
-        elif withdrawal:
-            calculated_balance = calculated_balance - withdrawal
-        elif deposit:
-            calculated_balance = calculated_balance + deposit
-        if balance != calculated_balance:
-            row[4] = calculated_balance
-        rows_added.append([*row, payee, category])
-    return rows_added
-
-
 def map_header_to_indexes(row: list[str]) -> dict:
     header_to_indexes = {}
     for idx, header in enumerate(row):
@@ -200,6 +172,34 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
             ]
         )
     return roll_up_rows
+
+
+def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
+    # header and data are already in desired format
+    # NOTE: credit cards do not have balance
+    # "Date", "Description", "Withdrawal", "Deposit", "Balance"
+    rows_added = [[*(rows[0]), "Payee", "Category"]]
+    # but the balance might be iffy, so keep a running total
+    calculated_balance = None
+    for row in rows[1:]:
+        description = row[1]
+        payee = payee_from_description(description)
+        category = category_from_description(description)
+        # and correct the balance if necessary
+        withdrawal = row[2]
+        deposit = row[3]
+        balance = row[4] if len(row) > 5 else None
+        if not calculated_balance:
+            # assume the first row's balance is ok
+            calculated_balance = balance
+        elif withdrawal:
+            calculated_balance = calculated_balance - withdrawal
+        elif deposit:
+            calculated_balance = calculated_balance + deposit
+        if balance != calculated_balance:
+            row[4] = calculated_balance
+        rows_added.append([*row, payee, category])
+    return rows_added
 
 
 def output_rows(rows: List[List[str]], output: str) -> None:
