@@ -16,7 +16,7 @@
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
       "args": ["../test/data/input/bmo_bank.pdf", "bmo_bank", "../test/data/new/bmo_bank.tsv"]
-    },   
+    },
     {
       "name": "Python: bmo_card File",
       "type": "python",
@@ -46,6 +46,16 @@
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${fileDirname}",
       "args": ["../test/data/input/rbc_card.pdf", "rbc_card", "../test/data/new/rbc_card.tsv"]
-    }    
+    },
+    {
+      "name": "Python: payee category rbc_card File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${fileDirname}",
+      "args": ["../test/data/new/rbc_card.tsv", "tsv", "../test/data/new/rbc_card_merge.csv"]
+    }
   ]
 }

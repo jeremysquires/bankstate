@@ -26,7 +26,7 @@ def get_run_params() -> Tuple[str, str, str]:
     )
     parser.add_argument(
         "filetype",
-        choices=["bmo_bank", "sco_visa"],
+        choices=["bmo_bank", "sco_visa", "tsv"],
         help=(
             f"is the type of input bank statement: "
             f"bmo is the Bank of Montreal, "
@@ -103,6 +103,7 @@ def payee_from_description(description: str) -> str:
 
 def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
     # header and data are already in desired format
+    # NOTE: credit cards do not have balance
     # "Date", "Description", "Withdrawal", "Deposit", "Balance"
     rows_added = [[*(rows[0]), "Payee", "Category"]]
     # but the balance might be iffy, so keep a running total
@@ -114,7 +115,7 @@ def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
         # and correct the balance if necessary
         withdrawal = row[2]
         deposit = row[3]
-        balance = row[4]
+        balance = row[4] if len(row) > 5 else None
         if not calculated_balance:
             # assume the first row's balance is ok
             calculated_balance = balance
@@ -202,7 +203,7 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
 
 
 def output_rows(rows: List[List[str]], output: str) -> None:
-    with open(output, mode="w", newline=None) as file:
+    with open(output, mode="w", newline='\n') as file:
         writer = csv.writer(file)
         writer.writerows(rows)
 
