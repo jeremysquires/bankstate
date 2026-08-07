@@ -399,5 +399,142 @@ class TestPayeeCategory(unittest.TestCase):
         self.assertListEqual(rows_expected, rows_out)
 
 
+    def test_map_tsv_transactions(self):
+        rows_tsv = [
+            [
+                "Date",
+                "Description",
+                "Withdrawal",
+                "Deposit",
+                "Balance",
+            ],
+            [
+                "01 Jan, 2026",
+                "Payroll Deposit COMPANY",
+                None,
+                1000.00,
+                2000.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+                1000.00,
+                None,
+                1000.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+                100,
+                None,
+                900.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, POWER COMPANY",
+                100.00,
+                None,
+                800.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "Direct Deposit, JOB INC. PAY/PAY",
+                None,
+                1000.00,
+                1800.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                100.00,
+                None,
+                1700.00,
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, COMMS COMPANY",
+                100.00,
+                None,
+                1600.00,
+            ],
+        ]
+        rows_expected = [
+            [
+                "Date",
+                "Description",
+                "Withdrawal",
+                "Deposit",
+                "Balance",
+                "Payee",
+                "Category",
+            ],
+            [
+                "01 Jan, 2026",
+                "Payroll Deposit COMPANY",
+                None,
+                1000.00,
+                2000.00,
+                "COMPANY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+                1000.00,
+                None,
+                1000.00,
+                "CITY TAX",
+                "Tax",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+                100,
+                None,
+                900.00,
+                "Neighborhood Lawn Care",
+                "Landscaping",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, POWER COMPANY",
+                100.00,
+                None,
+                800.00,
+                "POWER COMPANY",
+                "Utilities",
+            ],
+            [
+                "01 Jan, 2026",
+                "Direct Deposit, JOB INC. PAY/PAY",
+                None,
+                1000.00,
+                1800.00,
+                "JOB INC. PAY/PAY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                100.00,
+                None,
+                1700.00,
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                "Other",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, COMMS COMPANY",
+                100.00,
+                None,
+                1600.00,
+                "COMMS COMPANY",
+                "Internet",
+            ],
+        ]
+        rows_out = map_tsv_transactions(rows_tsv)
+        self.assertListEqual(rows_expected, rows_out)
+
+
 if __name__ == "__main__":
     unittest.main()

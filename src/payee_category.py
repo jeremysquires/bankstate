@@ -104,13 +104,13 @@ def payee_from_description(description: str) -> str:
 def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
     # header and data are already in desired format
     # "Date", "Description", "Withdrawal", "Deposit", "Balance"
-    rows_added = [*(rows[0]), "Payee", "Category"]
+    rows_added = [[*(rows[0]), "Payee", "Category"]]
     # but the balance might be iffy, so keep a running total
     calculated_balance = None
     for row in rows[1:]:
         description = row[1]
         payee = payee_from_description(description)
-        category = category_from_description(payee)
+        category = category_from_description(description)
         # and correct the balance if necessary
         withdrawal = row[2]
         deposit = row[3]
