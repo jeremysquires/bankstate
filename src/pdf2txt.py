@@ -275,6 +275,7 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     previous_month = None
     date_range_string = None
     for text_line in text_lines:
+        text_line = text_line.strip()
         if text_line.startswith("STATEMENT FROM"):
             # RBC MC
             date_range_string = text_line.split("STATEMENT FROM ")[1]
@@ -288,10 +289,27 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             end_month = end_datetime.month
             date_range_string = None
         text_line = text_line.replace("\t", " ")
-        if not in_rollup and (utils.is_two_part_date(text_line)):
+        # 2026+ pdfs produce two date lines sometimes
+        transaction_date = None
+        posted_date = None
+        two_date_list = text_line.split(" ")
+        if (
+            len(two_date_list) == 4 and
+            utils.is_two_part_date(trans_date := " ".join(two_date_list[0:2])) and
+            utils.is_two_part_date(post_date := " ".join(two_date_list[2:]))
+        ):
+            transaction_date = trans_date
+            posted_date = post_date
+        if not in_rollup and (
+            utils.is_two_part_date(text_line) or
+            (
+                transaction_date and posted_date
+            )
+        ):
             in_rollup = True
             field_number = 0
-            dd_mon = utils.normalize_to_dd_mon(text_line)
+            mon_dot_dd = transaction_date if transaction_date else text_line
+            dd_mon = utils.normalize_to_dd_mon(mon_dot_dd)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
             if previous_month and previous_month > entry_datetime.month:
                 year = year + 1
@@ -301,6 +319,8 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
                 year = end_year
             previous_month = entry_datetime.month
             roll_up = f"{dd_mon} {year}"
+            if posted_date:
+                field_number = 1
         elif in_rollup:
             field_number += 1
             if field_number == 1:

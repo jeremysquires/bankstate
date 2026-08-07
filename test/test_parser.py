@@ -329,5 +329,32 @@ class TestParser(unittest.TestCase):
         )
 
 
+    def test_two_date_bmo_card(self):
+        date_lines = [
+            "Dec. 17, 2023 - Jan. 6, 2024",
+            "Dec. 17 Dec. 18",
+            "Membership",
+            "MyMembership",
+            "3298749847539874",
+            "100.00",
+            "Jan. 1 Jan. 3",
+            "Food Court",
+            "City",
+            "Province",
+            "9808938408093",
+            "30.00",
+            "Jan. 4 Jan. 6 ",
+            "GAS GAS GAS",
+            "100.00",
+        ]
+        result_lines = roll_up_card_transactions(date_lines)
+        start_year = (result_lines[1].split("\t")[0].split(" "))[2]
+        end_year = (result_lines[2].split("\t")[0].split(" "))[2]
+        continue_year = (result_lines[3].split("\t")[0].split(" "))[2]
+        self.assertEqual(start_year, "2023")
+        self.assertEqual(end_year, "2024")
+        self.assertEqual(continue_year, "2024")
+
+
 if __name__ == "__main__":
     unittest.main()
