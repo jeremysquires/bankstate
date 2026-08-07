@@ -7,6 +7,8 @@ from src.payee_category import (
     category_from_description,
     payee_from_description,
     map_bmo_bank_transactions,
+    map_scotia_visa_transactions,
+    map_tsv_transactions,
 )
 
 
@@ -241,6 +243,159 @@ class TestPayeeCategory(unittest.TestCase):
             ],
         ]
         rows_out = map_bmo_bank_transactions(rows_bmo_bank, 1000.00)
+        self.assertListEqual(rows_expected, rows_out)
+
+
+    def test_map_scotia_visa_transactions(self):
+        rows_scotia_visa = [
+            [
+                "Filter",
+                "Date",
+                "Description",
+                "Sub-description",
+                "Status",
+                "Type of Transaction",
+                "Amount",
+            ],
+            [
+                "All available transactions (up to 2 years), From date=2026-01-01",
+                "2026-01-01",
+                "Payroll Deposit COMPANY",
+                "City",
+                "posted",
+                "Credit",
+                -1000,
+            ],
+            [
+                None,
+                "2026-01-01",
+                "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+                "City",
+                "posted",
+                "Debit",
+                1000,
+            ],
+            [
+                None,
+                "2026-01-01", 
+                "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+                "City",
+                "posted",
+                "Debit",
+                100,
+            ],
+            [
+                None,
+                "2026-01-01", 
+                "Online Bill Payment, POWER COMPANY",
+                "City",
+                "posted",
+                "Debit",
+                100,
+            ],
+            [
+                None,
+                "2026-01-01", 
+                "Direct Deposit, JOB INC. PAY/PAY",
+                "City",
+                "posted",
+                "Credit",
+                -1000,
+            ],
+            [
+                None,
+                "2026-01-01", 
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                "City",
+                "posted",
+                "Debit",
+                100,
+            ],
+            [
+                None,
+                "2026-01-01", 
+                "Online Bill Payment, COMMS COMPANY",
+                "City",
+                "posted",
+                "Debit",
+                100,
+            ],
+        ]
+        rows_expected = [
+            [
+                "Date",
+                "Description",
+                "Withdrawal",
+                "Deposit",
+                "Balance",
+                "Payee",
+                "Category",
+            ],
+            [
+                "01 Jan, 2026",
+                "Payroll Deposit COMPANY",
+                None,
+                1000.00,
+                2000.00,
+                "COMPANY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
+                1000.00,
+                None,
+                1000.00,
+                "CITY TAX",
+                "Tax",
+            ],
+            [
+                "01 Jan, 2026",
+                "INTERAC e-Transfer Sent Neighborhood Lawn Care",
+                100,
+                None,
+                900.00,
+                "Neighborhood Lawn Care",
+                "Landscaping",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, POWER COMPANY",
+                100.00,
+                None,
+                800.00,
+                "POWER COMPANY",
+                "Utilities",
+            ],
+            [
+                "01 Jan, 2026",
+                "Direct Deposit, JOB INC. PAY/PAY",
+                None,
+                1000.00,
+                1800.00,
+                "JOB INC. PAY/PAY",
+                "Salary",
+            ],
+            [
+                "01 Jan, 2026",
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                100.00,
+                None,
+                1700.00,
+                "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
+                "Other",
+            ],
+            [
+                "01 Jan, 2026",
+                "Online Bill Payment, COMMS COMPANY",
+                100.00,
+                None,
+                1600.00,
+                "COMMS COMPANY",
+                "Internet",
+            ],
+        ]
+        rows_out = map_scotia_visa_transactions(rows_scotia_visa, 1000.00)
         self.assertListEqual(rows_expected, rows_out)
 
 

@@ -1,7 +1,6 @@
 import argparse
 from datetime import datetime
 from typing import List, Tuple
-import utils
 import csv
 import re
 from functools import cache
@@ -102,12 +101,29 @@ def payee_from_description(description: str) -> str:
     return "Unknown"
 
 
-def add_payee_and_category(rows: List[List[str]]) -> List[List[str]]:
+def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
+    # header and data are already in desired format
+    # "Date", "Description", "Withdrawal", "Deposit", "Balance"
     rows_added = [*(rows[0]), "Payee", "Category"]
+    # but the balance might be iffy, so keep a running total
+    calculated_balance = None
     for row in rows[1:]:
         description = row[1]
         payee = payee_from_description(description)
         category = category_from_description(payee)
+        # and correct the balance if necessary
+        withdrawal = row[2]
+        deposit = row[3]
+        balance = row[4]
+        if not calculated_balance:
+            # assume the first row's balance is ok
+            calculated_balance = balance
+        elif withdrawal:
+            calculated_balance = calculated_balance - withdrawal
+        elif deposit:
+            calculated_balance = calculated_balance + deposit
+        if balance != calculated_balance:
+            row[4] = calculated_balance
         rows_added.append([*row, payee, category])
     return rows_added
 
@@ -150,8 +166,38 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
     return roll_up_rows
 
 
-def map_scotia_visa_transactions(rows: List[List[str]]) -> List[List[str]]:
-    roll_up_rows = [["Date", "Description", "Withdrawal", "Deposit", "Balance"]]
+def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
+    # "Filter", Date, Description, "Sub-description", Status, "Type of Transaction", Amount
+    header_to_indexes = map_header_to_indexes(rows[0])
+    roll_up_rows = [
+        ["Date", "Description", "Withdrawal", "Deposit", "Balance", "Payee", "Category"]
+    ]
+    for row in rows[1:]:
+        dateposted = datetime.strptime(
+            row[header_to_indexes["Date"]], "%Y-%m-%d"
+        ).strftime("%d %b, %Y")
+        description = row[header_to_indexes["Description"]]
+        amount = row[header_to_indexes["Amount"]]
+        transaction_type = row[header_to_indexes["Type of Transaction"]]
+        # check for visarro world where debits are positive and credits are negative
+        if amount <= 0.0 and transaction_type.lower() == "credit":
+            amount = -1.0 * amount
+        elif amount > 0.0 and transaction_type.lower() == "debit":
+            amount = -1.0 * amount
+        deposit = amount if amount >= 0.0 else None
+        withdrawal = -1.0 * amount if amount < 0.0 else None
+        balance = balance + amount if balance else None
+        roll_up_rows.append(
+            [
+                dateposted,
+                description,
+                withdrawal,
+                deposit,
+                balance,
+                payee_from_description(description),
+                category_from_description(description),
+            ]
+        )
     return roll_up_rows
 
 
@@ -164,6 +210,7 @@ def output_rows(rows: List[List[str]], output: str) -> None:
 def process():
     input, filetype, output, balance = get_run_params()
     rows = get_csv(input)
+    mapped_rows = []
     if filetype == "bmo_bank":
         # bank
         mapped_rows = map_bmo_bank_transactions(rows, balance)
@@ -172,9 +219,8 @@ def process():
         mapped_rows = map_scotia_visa_transactions(rows, balance)
     else:
         # tsv input
-        mapped_rows = rows
-    payee_category_rows = add_payee_and_category(mapped_rows)
-    output_rows(payee_category_rows, output)
+        mapped_rows = map_tsv_transactions(rows)
+    output_rows(mapped_rows, output)
 
 
 if __name__ == "__main__":
