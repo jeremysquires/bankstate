@@ -7,9 +7,11 @@ from functools import cache
 import json
 import os
 import pathlib
+from decimal import *
+import locale
 
 SCRIPT_DIR = pathlib.Path(__file__).parent.resolve()
-
+TWOPLACES = Decimal(10) ** -2
 
 def get_run_params() -> Tuple[str, str, str]:
     parser = argparse.ArgumentParser(
@@ -104,13 +106,15 @@ def payee_from_description(description: str) -> str:
 def map_header_to_indexes(row: list[str]) -> dict:
     header_to_indexes = {}
     for idx, header in enumerate(row):
-        header_to_indexes[header] = idx
+        header_to_indexes[header.strip()] = idx
     return header_to_indexes
 
 
 def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
     # "First Bank Card", "Transaction Type", "Date Posted", "Transaction Amount", Description
     header_to_indexes = map_header_to_indexes(rows[0])
+    if balance:
+        balance = Decimal(locale.atof(balance)).quantize(TWOPLACES)
     # remove [CW] transaction type prefixes from descriptions
     p = re.compile(r"\[..\]")
     roll_up_rows = [
@@ -121,17 +125,17 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
             row[header_to_indexes["Date Posted"]], "%Y%m%d"
         ).strftime("%d %b, %Y")
         description = p.sub("", row[header_to_indexes["Description"]])
-        amount = row[header_to_indexes["Transaction Amount"]]
-        deposit = amount if amount >= 0.0 else None
-        withdrawal = -1.0 * amount if amount < 0.0 else None
-        balance = balance + amount if balance else None
+        amount = Decimal(locale.atof(row[header_to_indexes["Transaction Amount"]])).quantize(TWOPLACES)
+        deposit = amount if amount >= 0.0 else ""
+        withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
+        balance = balance + amount if balance else ""
         roll_up_rows.append(
             [
                 dateposted,
                 description,
-                withdrawal,
-                deposit,
-                balance,
+                str(withdrawal.quantize(TWOPLACES) if withdrawal else ""),
+                str(deposit.quantize(TWOPLACES) if deposit else ""),
+                str(balance.quantize(TWOPLACES) if balance else ""),
                 payee_from_description(description),
                 category_from_description(description),
             ]
@@ -142,6 +146,8 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
 def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
     # "Filter", Date, Description, "Sub-description", Status, "Type of Transaction", Amount
     header_to_indexes = map_header_to_indexes(rows[0])
+    if balance:
+        balance = Decimal(locale.atof(balance)).quantize(TWOPLACES)
     roll_up_rows = [
         ["Date", "Description", "Withdrawal", "Deposit", "Balance", "Payee", "Category"]
     ]
@@ -150,23 +156,23 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
             row[header_to_indexes["Date"]], "%Y-%m-%d"
         ).strftime("%d %b, %Y")
         description = row[header_to_indexes["Description"]]
-        amount = row[header_to_indexes["Amount"]]
+        amount = Decimal(locale.atof(row[header_to_indexes["Amount"]])).quantize(TWOPLACES)
         transaction_type = row[header_to_indexes["Type of Transaction"]]
         # check for visarro world where debits are positive and credits are negative
         if amount <= 0.0 and transaction_type.lower() == "credit":
-            amount = -1.0 * amount
+            amount = Decimal("-1.00") * amount
         elif amount > 0.0 and transaction_type.lower() == "debit":
-            amount = -1.0 * amount
-        deposit = amount if amount >= 0.0 else None
-        withdrawal = -1.0 * amount if amount < 0.0 else None
-        balance = balance + amount if balance else None
+            amount = Decimal("-1.00") * amount
+        deposit = amount if amount >= 0.0 else ""
+        withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
+        balance = balance + amount if balance else ""
         roll_up_rows.append(
             [
                 dateposted,
                 description,
-                withdrawal,
-                deposit,
-                balance,
+                str(withdrawal.quantize(TWOPLACES) if withdrawal else ""),
+                str(deposit.quantize(TWOPLACES) if deposit else ""),
+                str(balance.quantize(TWOPLACES) if balance else ""),
                 payee_from_description(description),
                 category_from_description(description),
             ]
@@ -182,22 +188,25 @@ def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
     # but the balance might be iffy, so keep a running total
     calculated_balance = None
     for row in rows[1:]:
-        description = row[1]
+        # the balance will be fixed here, so any errors will be replaced
+        description = row[1].replace(" ERR:BALANCE", "")
         payee = payee_from_description(description)
         category = category_from_description(description)
-        # and correct the balance if necessary
-        withdrawal = row[2]
-        deposit = row[3]
-        balance = row[4] if len(row) > 5 else None
+        # and correct the balance if necessary, normalizing numbers to remove localization
+        withdrawal = Decimal(locale.atof(row[2])).quantize(TWOPLACES) if row[2] else ""
+        row[2] = str(withdrawal)
+        deposit = Decimal(locale.atof(row[3])).quantize(TWOPLACES) if row[3] else ""
+        row[3] = str(deposit)
+        balance = Decimal(locale.atof(row[4])).quantize(TWOPLACES) if len(row) >= 5 and row[4] else ""
         if not calculated_balance:
-            # assume the first row's balance is ok
+            # assume the first row's balance is ok or not present ("")
             calculated_balance = balance
         elif withdrawal:
             calculated_balance = calculated_balance - withdrawal
         elif deposit:
             calculated_balance = calculated_balance + deposit
-        if balance != calculated_balance:
-            row[4] = calculated_balance
+        if len(row) >= 5 and row[4]:
+            row[4] = str(calculated_balance.quantize(TWOPLACES))
         rows_added.append([*row, payee, category])
     return rows_added
 
@@ -209,6 +218,7 @@ def output_rows(rows: List[List[str]], output: str) -> None:
 
 
 def process():
+    locale.setlocale(locale.LC_NUMERIC, '')
     input, filetype, output, balance = get_run_params()
     rows = get_csv(input)
     mapped_rows = []
