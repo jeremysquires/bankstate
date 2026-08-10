@@ -67,7 +67,10 @@ def get_csv(filename: str) -> List[str]:
 @cache
 def get_category_patterns() -> dict[str, str]:
     # regex matches for specific payee patterns
-    if os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
+    if os.path.exists(f"{SCRIPT_DIR}/my_category_patterns.json"):
+        with open(f"{SCRIPT_DIR}/my_category_patterns.json", "r") as file:
+            return json.load(file)
+    elif os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
         with open(f"{SCRIPT_DIR}/category_patterns.json", "r") as file:
             return json.load(file)
     return {}
@@ -76,7 +79,10 @@ def get_category_patterns() -> dict[str, str]:
 @cache
 def get_payee_patterns() -> list[str]:
     # regex matches for specific payee patterns
-    if os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
+    if os.path.exists(f"{SCRIPT_DIR}/my_payee_patterns.json"):
+        with open(f"{SCRIPT_DIR}/my_payee_patterns.json", "r") as file:
+            return json.load(file)
+    elif os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
         with open(f"{SCRIPT_DIR}/payee_patterns.json", "r") as file:
             return json.load(file)
     return []

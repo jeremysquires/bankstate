@@ -1,12 +1,13 @@
 {
     "Transfer": " TF ",
     "Salary": "PAY\\W|Payroll",
-    "Tax": "HST|GST|VAT|TAX",
-    "Service": "Monthly fee|annual fee|annual cash back|MultiProduct Rebate|FULL PLAN FEE REBATE|PREMIUM PLAN",
+    "Taxes": "HST|GST|VAT|TAX",
+    "Bank Services": "Monthly fee|annual fee|annual cash back|MultiProduct Rebate|FULL PLAN FEE REBATE|PREMIUM PLAN",
     "Insurance": "Insurance",
-    "Investment": "Invest|DIVIDEND",
-    "Cash": "Cash withdrawal|ABM",
+    "Investment Income": "Invest|DIVIDEND",
+    "Withdrawal": "Cash withdrawal|ABM",
     "Internet": "COMM",
-    "Utilities": "POWER|WATER",
-    "Landscaping": "Lawn|Tree|Green"
+    "Electricity": "POWER",
+    "Water": "WATER",
+    "Landscaping": "Lawn|Tree|Green|Landscap"
 }
