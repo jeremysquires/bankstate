@@ -129,7 +129,7 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
     for row in rows[1:]:
         dateposted = datetime.strptime(
             row[header_to_indexes["Date Posted"]], "%Y%m%d"
-        ).strftime("%d %b, %Y")
+        ).strftime("%d %b %Y")
         description = p.sub("", row[header_to_indexes["Description"]])
         amount = Decimal(locale.atof(row[header_to_indexes["Transaction Amount"]])).quantize(TWOPLACES)
         deposit = amount if amount >= 0.0 else ""
@@ -160,7 +160,7 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
     for row in rows[1:]:
         dateposted = datetime.strptime(
             row[header_to_indexes["Date"]], "%Y-%m-%d"
-        ).strftime("%d %b, %Y")
+        ).strftime("%d %b %Y")
         description = row[header_to_indexes["Description"]]
         amount = Decimal(locale.atof(row[header_to_indexes["Amount"]])).quantize(TWOPLACES)
         transaction_type = row[header_to_indexes["Type of Transaction"]]
