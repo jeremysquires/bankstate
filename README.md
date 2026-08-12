@@ -69,7 +69,7 @@ It writes a standard import CSV format file. Sample REGEX patterns are found in 
 * Copy `category_patterns.json` into `my_category_patterns.json` and customize it for your needs
 
 ```bash
-pipenv python pdf2txt.py filename.pdf <filetype> output.tsv
+pipenv python payee_category.py filename <filetype> output.csv
 # Where: filetype = [ bmo_bank | sco_visa | tsv ]
 ```
 
