@@ -1,6 +1,6 @@
 import argparse
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import csv
 import re
 from functools import cache
@@ -66,7 +66,7 @@ def get_csv(filename: str) -> List[str]:
 
 @cache
 def get_category_patterns() -> dict[str, str]:
-    # regex matches for specific payee patterns
+    # regex matches for specific category patterns
     if os.path.exists(f"{SCRIPT_DIR}/my_category_patterns.json"):
         with open(f"{SCRIPT_DIR}/my_category_patterns.json", "r") as file:
             return json.load(file)
@@ -116,6 +116,24 @@ def map_header_to_indexes(row: list[str]) -> dict:
     return header_to_indexes
 
 
+def fields_to_row(
+    dateposted: str,
+    description: str,
+    withdrawal: Union[Decimal, str],
+    deposit: Union[Decimal, str],
+    balance: Union[Decimal, str]
+    ) -> List[str]:
+    return [
+        dateposted,
+        description,
+        str(withdrawal.quantize(TWOPLACES) if withdrawal else ""),
+        str(deposit.quantize(TWOPLACES) if deposit else ""),
+        str(balance.quantize(TWOPLACES) if balance else ""),
+        payee_from_description(description),
+        category_from_description(description),
+    ]
+
+
 def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
     # "First Bank Card", "Transaction Type", "Date Posted", "Transaction Amount", Description
     header_to_indexes = map_header_to_indexes(rows[0])
@@ -135,17 +153,7 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
         deposit = amount if amount >= 0.0 else ""
         withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
         balance = balance + amount if balance else ""
-        roll_up_rows.append(
-            [
-                dateposted,
-                description,
-                str(withdrawal.quantize(TWOPLACES) if withdrawal else ""),
-                str(deposit.quantize(TWOPLACES) if deposit else ""),
-                str(balance.quantize(TWOPLACES) if balance else ""),
-                payee_from_description(description),
-                category_from_description(description),
-            ]
-        )
+        roll_up_rows.append(fields_to_row(dateposted, description, withdrawal, deposit, balance))
     return roll_up_rows
 
 
@@ -172,17 +180,7 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
         deposit = amount if amount >= 0.0 else ""
         withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
         balance = balance + amount if balance else ""
-        roll_up_rows.append(
-            [
-                dateposted,
-                description,
-                str(withdrawal.quantize(TWOPLACES) if withdrawal else ""),
-                str(deposit.quantize(TWOPLACES) if deposit else ""),
-                str(balance.quantize(TWOPLACES) if balance else ""),
-                payee_from_description(description),
-                category_from_description(description),
-            ]
-        )
+        roll_up_rows.append(fields_to_row(dateposted, description, withdrawal, deposit, balance))
     return roll_up_rows
 
 
