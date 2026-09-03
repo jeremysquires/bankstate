@@ -1,27 +1,27 @@
 import argparse
 from datetime import datetime
-from typing import List, Tuple, Union
+from typing import List, Union
 import csv
 import re
 from functools import cache
 import json
 import os
 import pathlib
-from decimal import *
+from decimal import Decimal
 import locale
 
 SCRIPT_DIR = pathlib.Path(__file__).parent.resolve()
 TWOPLACES = Decimal(10) ** -2
-CONFIG = None
+CONFIG = SCRIPT_DIR
 
 
 def get_run_params() -> dict[str, str]:
     parser = argparse.ArgumentParser(
         prog="payee_category.py",
-        description="Converts bank statement TSV/CSVs to a common format and adds payees and categories",
+        description="Convert bank stmt TSV/CSV to final schema, add payees and categories",
         epilog=(
-            f"Copyright (C) 2026 Jeremy Squires <jms@mailforce.net> "
-            f"License: <https://opensource.org/licenses/MIT>"
+            "Copyright (C) 2026 Jeremy Squires <jms@mailforce.net> "
+            "License: <https://opensource.org/licenses/MIT>"
         ),
     )
     parser.add_argument(
@@ -32,27 +32,27 @@ def get_run_params() -> dict[str, str]:
         "filetype",
         choices=["bmo_bank", "sco_visa", "tsv"],
         help=(
-            f"is the type of input bank statement: "
-            f"bmo is the Bank of Montreal, "
-            f"sco is the Scotiabank, "
-            f"_bank is a bank current account statement, and "
-            f"_visa is a VisaCard statement"
+            "is the type of input bank statement: "
+            "bmo is the Bank of Montreal, "
+            "sco is the Scotiabank, "
+            "_bank is a bank current account statement, and "
+            "_visa is a VisaCard statement"
         ),
     )
     parser.add_argument(
         "output",
-        help=f"output is the path to the CSV output file",
+        help="output is the path to the CSV output file",
     )
     parser.add_argument(
         "--balance",
         "-b",
-        help=(f"balance before first transaction"),
+        help="balance before first transaction",
         default="",
     )
     parser.add_argument(
         "--config",
         "-c",
-        help=(f"path to configuration files"),
+        help="path to configuration files",
         default="",
     )
     args = parser.parse_args()
@@ -75,10 +75,10 @@ def get_csv(filename: str) -> List[str]:
 def get_category_patterns() -> dict[str, str]:
     # regex matches for specific category patterns
     if os.path.exists(f"{CONFIG}/my_category_patterns.json"):
-        with open(f"{CONFIG}/my_category_patterns.json", "r") as file:
+        with open(f"{CONFIG}/my_category_patterns.json", "r", encoding="utf8") as file:
             return json.load(file)
     elif os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
-        with open(f"{SCRIPT_DIR}/category_patterns.json", "r") as file:
+        with open(f"{SCRIPT_DIR}/category_patterns.json", "r", encoding="utf8") as file:
             return json.load(file)
     return {}
 
@@ -87,17 +87,16 @@ def get_category_patterns() -> dict[str, str]:
 def get_payee_patterns() -> list[str]:
     # regex matches for specific payee patterns
     if os.path.exists(f"{CONFIG}/my_payee_patterns.json"):
-        with open(f"{CONFIG}/my_payee_patterns.json", "r") as file:
+        with open(f"{CONFIG}/my_payee_patterns.json", "r", encoding="utf8") as file:
             return json.load(file)
     elif os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
-        with open(f"{SCRIPT_DIR}/payee_patterns.json", "r") as file:
+        with open(f"{SCRIPT_DIR}/payee_patterns.json", "r", encoding="utf8") as file:
             return json.load(file)
     return []
 
 
 def category_from_description(description: str) -> str:
     category_patterns = get_category_patterns()
-    # TODO: if match multiple times, return most likely (https://github.com/jeremysquires/bankstate/issues/50)
     for key, value in category_patterns.items():
         p = re.compile(value, re.IGNORECASE)
         if re.search(p, description):
@@ -237,7 +236,7 @@ def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
 
 
 def output_rows(rows: List[List[str]], output: str) -> None:
-    with open(output, mode="w", newline="\n") as file:
+    with open(output, mode="w", newline="\n", encoding="utf8") as file:
         writer = csv.writer(file)
         writer.writerows(rows)
 
@@ -246,12 +245,12 @@ def process():
     global CONFIG
     locale.setlocale(locale.LC_NUMERIC, "")
     args = get_run_params()
-    input = args.input
+    input_path = args.input
     filetype = args.filetype
     output = args.output
     balance = args.balance or ""
     CONFIG = args.config or SCRIPT_DIR
-    rows = get_csv(input)
+    rows = get_csv(input_path)
     mapped_rows = []
     if filetype == "bmo_bank":
         # bank

@@ -258,7 +258,7 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "9,700.00", "9,900.00", "9,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
 
     def test_undated_rows_rbc_bank(self):
@@ -292,7 +292,7 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "9,700.00", "9,900.00", "9,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
 
     def test_skip_balance_rbc_bank(self):
@@ -325,7 +325,7 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "10,300.00", "10,500.00", "11,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
 
     def test_two_date_bmo_card(self):
