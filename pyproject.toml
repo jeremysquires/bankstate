@@ -1,0 +1,33 @@
+[project]
+name = "bankstate"
+version = "0.3.0"
+requires-python = ">=3.9"
+dependencies = [
+    "pypdf>=3.5.0",
+    "python-dateutil>=2.8.2",
+    "pymupdf>=1.21.1",
+]
+
+[dependency-groups]
+dev = [
+    "black",
+    "pylint",
+]
+
+[tool.uv]
+package = false
+default-groups = "all"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+# [project.scripts]
+# format = "black src/*.py test/*.py"
+# lint = "pylint ./src ./test"
+# test = "python -m unittest discover -s test -v"
+# test_handlers = "bash ./test/test_handlers.sh"
+
+[build-system]
+requires = ["uv_build>=0.12.0,<0.13"]
+build-backend = "uv_build"

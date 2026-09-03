@@ -33,23 +33,23 @@ mkdir -p ./test/data/new
 cd src
 
 # test_bmo_bank
-pipenv run python pdf2txt.py ../test/data/input/bmo_bank.pdf bmo_bank ../test/data/new/bmo_bank.tsv -c ../test/data/raw/bmo_bank.txt
+uv run python pdf2txt.py ../test/data/input/bmo_bank.pdf bmo_bank ../test/data/new/bmo_bank.tsv -c ../test/data/raw/bmo_bank.txt
 # test_bmo_card
-pipenv run python pdf2txt.py ../test/data/input/bmo_card.pdf bmo_card ../test/data/new/bmo_card.tsv -c ../test/data/raw/bmo_card.txt
+uv run python pdf2txt.py ../test/data/input/bmo_card.pdf bmo_card ../test/data/new/bmo_card.tsv -c ../test/data/raw/bmo_card.txt
 # test_bmo_card2
-pipenv run python pdf2txt.py ../test/data/input/bmo_card2.pdf bmo_card ../test/data/new/bmo_card2.tsv -c ../test/data/raw/bmo_card2.txt
+uv run python pdf2txt.py ../test/data/input/bmo_card2.pdf bmo_card ../test/data/new/bmo_card2.tsv -c ../test/data/raw/bmo_card2.txt
 # test_rbc_bank
-pipenv run python pdf2txt.py ../test/data/input/rbc_bank.pdf rbc_bank ../test/data/new/rbc_bank.tsv -c ../test/data/raw/rbc_bank.txt
+uv run python pdf2txt.py ../test/data/input/rbc_bank.pdf rbc_bank ../test/data/new/rbc_bank.tsv -c ../test/data/raw/rbc_bank.txt
 # test_rbc_bank2
-pipenv run python pdf2txt.py ../test/data/input/rbc_bank2.pdf rbc_bank ../test/data/new/rbc_bank2.tsv -c ../test/data/raw/rbc_bank2.txt
+uv run python pdf2txt.py ../test/data/input/rbc_bank2.pdf rbc_bank ../test/data/new/rbc_bank2.tsv -c ../test/data/raw/rbc_bank2.txt
 # test_rbc_bank_2023
-pipenv run python pdf2txt.py ../test/data/input/rbc_bank_2023.pdf rbc_bank ../test/data/new/rbc_bank_2023.tsv -c ../test/data/raw/rbc_bank_2023.txt
+uv run python pdf2txt.py ../test/data/input/rbc_bank_2023.pdf rbc_bank ../test/data/new/rbc_bank_2023.tsv -c ../test/data/raw/rbc_bank_2023.txt
 # test_rbc_bank_2025
-pipenv run python pdf2txt.py ../test/data/input/rbc_bank_2025.pdf rbc_bank ../test/data/new/rbc_bank_2025.tsv -c ../test/data/raw/rbc_bank_2025.txt
+uv run python pdf2txt.py ../test/data/input/rbc_bank_2025.pdf rbc_bank ../test/data/new/rbc_bank_2025.tsv -c ../test/data/raw/rbc_bank_2025.txt
 # test_rbc_card
-pipenv run python pdf2txt.py ../test/data/input/rbc_card.pdf rbc_card ../test/data/new/rbc_card.tsv -c ../test/data/raw/rbc_card.txt
+uv run python pdf2txt.py ../test/data/input/rbc_card.pdf rbc_card ../test/data/new/rbc_card.tsv -c ../test/data/raw/rbc_card.txt
 # test_rbc_card_2026
-pipenv run python pdf2txt.py ../test/data/input/rbc_card_2026.pdf rbc_card ../test/data/new/rbc_card_2026.tsv -c ../test/data/raw/rbc_card_2026.txt
+uv run python pdf2txt.py ../test/data/input/rbc_card_2026.pdf rbc_card ../test/data/new/rbc_card_2026.tsv -c ../test/data/raw/rbc_card_2026.txt
 
 # check test output
 cd ../test/data
@@ -62,21 +62,21 @@ fi
 
 # check processing raw input test_bmo_bank will result in the same output (don't need to check all of them)
 cd ../../src
-pipenv run python pdf2txt.py ../test/data/raw/bmo_bank.txt bmo_bank ../test/data/new/bmo_bank.tsv -f cap
+uv run python pdf2txt.py ../test/data/raw/bmo_bank.txt bmo_bank ../test/data/new/bmo_bank.tsv -f cap
 cd ../test/data
 diff orig new
 
 # check processing payee categories
 cd ../../src
-pipenv run python payee_category.py ../test/data/new/bmo_bank.tsv tsv ../test/data/new/bmo_bank.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/bmo_card.tsv tsv ../test/data/new/bmo_card.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/bmo_card2.tsv tsv ../test/data/new/bmo_card2.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_bank.tsv tsv ../test/data/new/rbc_bank.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_bank2.tsv tsv ../test/data/new/rbc_bank2.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_bank_2023.tsv tsv ../test/data/new/rbc_bank_2023.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_bank_2025.tsv tsv ../test/data/new/rbc_bank_2025.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_card.tsv tsv ../test/data/new/rbc_card.tsv.merge.csv -c ../test/data/configs
-pipenv run python payee_category.py ../test/data/new/rbc_card_2026.tsv tsv ../test/data/new/rbc_card_2026.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/bmo_bank.tsv tsv ../test/data/new/bmo_bank.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/bmo_card.tsv tsv ../test/data/new/bmo_card.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/bmo_card2.tsv tsv ../test/data/new/bmo_card2.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_bank.tsv tsv ../test/data/new/rbc_bank.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_bank2.tsv tsv ../test/data/new/rbc_bank2.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_bank_2023.tsv tsv ../test/data/new/rbc_bank_2023.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_bank_2025.tsv tsv ../test/data/new/rbc_bank_2025.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_card.tsv tsv ../test/data/new/rbc_card.tsv.merge.csv -c ../test/data/configs
+uv run python payee_category.py ../test/data/new/rbc_card_2026.tsv tsv ../test/data/new/rbc_card_2026.tsv.merge.csv -c ../test/data/configs
 cd ../test/data
 diff orig new
 
