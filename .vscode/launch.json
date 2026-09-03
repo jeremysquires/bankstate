@@ -58,14 +58,13 @@
       "args": ["../test/data/new/rbc_card.tsv", "tsv", "../test/data/new/rbc_card_merge.csv"]
     },
     {
-      "name": "Python: payee category bmo_bank File",
-      "type": "python",
+      "name": "Python: Debug Tests",
+      "type": "debugpy",
       "request": "launch",
       "program": "${file}",
+      "purpose": ["debug-test"],
       "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env",
-      "cwd": "${fileDirname}",
-      "args": ["../test/data/input/bmo_bank.csv", "bmo_bank", "../test/data/new/bmo_bank_merge.csv"]
+      "justMyCode": false
     }
   ]
 }
