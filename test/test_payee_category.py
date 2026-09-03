@@ -2,7 +2,8 @@ import os
 import sys
 import unittest
 import locale
-locale.setlocale(locale.LC_NUMERIC, '')
+
+locale.setlocale(locale.LC_NUMERIC, "")
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 from src.payee_category import (
@@ -79,8 +80,8 @@ class TestPayeeCategory(unittest.TestCase):
             "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP expected
             "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP expected
             "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE expected
-            "SOME STORE #00144 CITY PROVINCE", # SOME STORE expected
-            "SOME STORE #00144      CITY PROVINCE", # SOME STORE expected
+            "SOME STORE #00144 CITY PROVINCE",  # SOME STORE expected
+            "SOME STORE #00144      CITY PROVINCE",  # SOME STORE expected
             "#930 MARK'S           CITY1 PROVINCE1",  # MARK'S expected
         ]
         payees = [
@@ -250,7 +251,6 @@ class TestPayeeCategory(unittest.TestCase):
         rows_out = map_bmo_bank_transactions(rows_bmo_bank, "1000.00")
         self.assertListEqual(rows_expected, rows_out)
 
-
     def test_map_scotia_visa_transactions(self):
         rows_scotia_visa = [
             [
@@ -282,7 +282,7 @@ class TestPayeeCategory(unittest.TestCase):
             ],
             [
                 "",
-                "2026-01-01", 
+                "2026-01-01",
                 "INTERAC e-Transfer Sent Neighborhood Lawn Care",
                 "City",
                 "posted",
@@ -291,7 +291,7 @@ class TestPayeeCategory(unittest.TestCase):
             ],
             [
                 "",
-                "2026-01-01", 
+                "2026-01-01",
                 "Online Bill Payment, POWER COMPANY",
                 "City",
                 "posted",
@@ -300,7 +300,7 @@ class TestPayeeCategory(unittest.TestCase):
             ],
             [
                 "",
-                "2026-01-01", 
+                "2026-01-01",
                 "Direct Deposit, JOB INC. PAY/PAY",
                 "City",
                 "posted",
@@ -309,7 +309,7 @@ class TestPayeeCategory(unittest.TestCase):
             ],
             [
                 "",
-                "2026-01-01", 
+                "2026-01-01",
                 "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
                 "City",
                 "posted",
@@ -318,7 +318,7 @@ class TestPayeeCategory(unittest.TestCase):
             ],
             [
                 "",
-                "2026-01-01", 
+                "2026-01-01",
                 "Online Bill Payment, COMMS COMPANY",
                 "City",
                 "posted",
@@ -402,7 +402,6 @@ class TestPayeeCategory(unittest.TestCase):
         ]
         rows_out = map_scotia_visa_transactions(rows_scotia_visa, "1000.00")
         self.assertListEqual(rows_expected, rows_out)
-
 
     def test_map_tsv_transactions(self):
         rows_tsv = [
@@ -539,7 +538,6 @@ class TestPayeeCategory(unittest.TestCase):
         ]
         rows_out = map_tsv_transactions(rows_tsv)
         self.assertListEqual(rows_expected, rows_out)
-
 
     def test_locale_map_tsv_transactions(self):
         rows_tsv = [

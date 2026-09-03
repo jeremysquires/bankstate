@@ -328,7 +328,6 @@ class TestParser(unittest.TestCase):
             any([bool("ERR:BALANCE" in description) for description in descriptions])
         )
 
-
     def test_two_date_bmo_card(self):
         date_lines = [
             "Dec. 17, 2023 - Jan. 6, 2024",

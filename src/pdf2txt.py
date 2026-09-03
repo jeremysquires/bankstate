@@ -294,17 +294,14 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
         posted_date = None
         two_date_list = text_line.split(" ")
         if (
-            len(two_date_list) == 4 and
-            utils.is_two_part_date(trans_date := " ".join(two_date_list[0:2])) and
-            utils.is_two_part_date(post_date := " ".join(two_date_list[2:]))
+            len(two_date_list) == 4
+            and utils.is_two_part_date(trans_date := " ".join(two_date_list[0:2]))
+            and utils.is_two_part_date(post_date := " ".join(two_date_list[2:]))
         ):
             transaction_date = trans_date
             posted_date = post_date
         if not in_rollup and (
-            utils.is_two_part_date(text_line) or
-            (
-                transaction_date and posted_date
-            )
+            utils.is_two_part_date(text_line) or (transaction_date and posted_date)
         ):
             in_rollup = True
             field_number = 0
