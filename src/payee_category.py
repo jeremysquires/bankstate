@@ -90,7 +90,7 @@ def get_payee_patterns() -> list[str]:
 
 def category_from_description(description: str) -> str:
     category_patterns = get_category_patterns()
-    # TODO: if match multiple times, return most likely
+    # TODO: if match multiple times, return most likely (https://github.com/jeremysquires/bankstate/issues/50)
     for key, value in category_patterns.items():
         p = re.compile(value, re.IGNORECASE)
         if re.search(p, description):
