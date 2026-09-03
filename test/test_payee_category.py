@@ -23,7 +23,6 @@ class TestPayeeCategory(unittest.TestCase):
             "INTERAC ETRNSFR SENT     CITY TAX          20260805DEFS",
             "MAGOO'S            CITY1 PROVINCE1",
             "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
-            "SOME STORE #00144 CITY PROVINCE",
             "INTERAC e-Transfer Sent Neighborhood Lawn Care",
             "Online Bill Payment, POWER COMPANY",
             "Direct Deposit, JOB INC. PAY/PAY",
@@ -36,7 +35,6 @@ class TestPayeeCategory(unittest.TestCase):
             "CITY TAX",
             "MAGOO'S",
             "MARKETPLACE*VENDOR WWW.MARKETPLACE.COM",
-            "SOME STORE",
             "Neighborhood Lawn Care",
             "POWER COMPANY",
             "JOB INC. PAY/PAY",
@@ -52,7 +50,6 @@ class TestPayeeCategory(unittest.TestCase):
             "LinkedIn 6367341474     LINKEDIN.COM IRL",
             "Amazon.ca*A99AA9A99        AMAZON.CA ON",
             "SHELL C99999            CITY PROVINCE",
-            "#930 MARK'S           CITY1 PROVINCE1",  # Special rule for MARK'S
             "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
             "BOOKSTORE 123           CITY1",  # BOOKSTORE not implemented
             "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
@@ -64,7 +61,6 @@ class TestPayeeCategory(unittest.TestCase):
             "LinkedIn",
             "Amazon.ca",
             "SHELL",
-            "MARK'S",
             "- 1324",
             "BOOKSTORE 123",
             "OUTER ROAD OTHERSHOP",
@@ -78,10 +74,13 @@ class TestPayeeCategory(unittest.TestCase):
     def test_malfunctioning_payee_from_description(self):
         descriptions = [
             "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
-            "BOOKSTORE 123           CITY1",  # BOOKSTORE not implemented
-            "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
-            "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP not implemented
-            "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE not implemented
+            "BOOKSTORE 123           CITY1",  # BOOKSTORE expected
+            "OUTER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP expected
+            "INNER ROAD OTHERSHOP           CITY1 PROVINCE1",  # OTHERSHOP expected
+            "ONLINESTORE 12345678 WWW.STORE.COM",  # ONLINESTORE expected
+            "SOME STORE #00144 CITY PROVINCE", # SOME STORE expected
+            "SOME STORE #00144      CITY PROVINCE", # SOME STORE expected
+            "#930 MARK'S           CITY1 PROVINCE1",  # MARK'S expected
         ]
         payees = [
             "- 1324",
@@ -89,6 +88,9 @@ class TestPayeeCategory(unittest.TestCase):
             "OUTER ROAD OTHERSHOP",
             "INNER ROAD OTHERSHOP",
             "ONLINESTORE 12345678 WWW.STORE.COM",
+            "SOME STORE CITY PROVINCE",
+            "SOME STORE CITY PROVINCE",
+            "MARK'S CITY1 PROVINCE1",
         ]
         for idx, description in enumerate(descriptions):
             payee = payee_from_description(description)
