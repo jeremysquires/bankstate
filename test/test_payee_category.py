@@ -72,6 +72,7 @@ class TestPayeeCategory(unittest.TestCase):
             self.assertEqual(payee, payees[idx])
 
     def test_malfunctioning_payee_from_description(self):
+        # TODO: fix these ... https://github.com/jeremysquires/bankstate/issues/51
         descriptions = [
             "Online Banking transfer - 1324",  # "(\\w) - (\\w)" pattern breaks others
             "BOOKSTORE 123           CITY1",  # BOOKSTORE expected
