@@ -1,9 +1,13 @@
 import argparse
+import sys
+import os
 from datetime import datetime
-from pypdf import PdfReader
 from typing import List, Tuple
+from pypdf import PdfReader
 import fitz
-import utils
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src import utils
 
 
 def get_run_params() -> Tuple[str, str, str, str, str]:
@@ -11,8 +15,8 @@ def get_run_params() -> Tuple[str, str, str, str, str]:
         prog="pdf2txt.py",
         description="Converts bank statement PDFs to TSV/CSV for import into home finance software",
         epilog=(
-            f"Copyright (C) 2017, 2023, 2026 Jeremy Squires <jms@mailforce.net> "
-            f"License: <https://opensource.org/licenses/MIT>"
+            "Copyright (C) 2017, 2023, 2026 Jeremy Squires <jms@mailforce.net> "
+            "License: <https://opensource.org/licenses/MIT>"
         ),
     )
     parser.add_argument(
@@ -23,28 +27,28 @@ def get_run_params() -> Tuple[str, str, str, str, str]:
         "filetype",
         choices=["bmo_bank", "bmo_card", "rbc_bank", "rbc_card"],
         help=(
-            f"is the type of input bank statement: "
-            f"bmo is the Bank of Montreal, "
-            f"rbc is the Royal Bank of Canada, "
-            f"_bank is a bank current account statement, and "
-            f"_card is a MasterCard statement"
+            "is the type of input bank statement: "
+            "bmo is the Bank of Montreal, "
+            "rbc is the Royal Bank of Canada, "
+            "_bank is a bank current account statement, and "
+            "_card is a MasterCard statement"
         ),
     )
     parser.add_argument(
         "output",
-        help=f"output is the path to the CSV/TSV output file",
+        help="output is the path to the CSV/TSV output file",
     )
     parser.add_argument(
         "--capture",
         "-c",
-        help=(f"path to a raw data capture output file," f" defaults to <output>.cap"),
+        help="path to a raw data capture output file, defaults to <output>.cap",
         default=None,
     )
     parser.add_argument(
         "--format",
         "-f",
         choices=["pdf", "cap"],
-        help=(f"format of input file, default pdf, cap for captures"),
+        help="format of input file, default pdf, cap for captures",
         default="pdf",
     )
     args = parser.parse_args()
@@ -62,21 +66,20 @@ def get_raw_text_lines_pypdf(filename: str) -> List[str]:
     Nov /0/6 Opening balance /2/2c/0/0/0/2e/0/0
     Nov /0/8 Online Bill Payment/2c HEAT /2/0/0/2e/0/0 /2/2c/1/2e/8/0/0/2e/0/0
     """
-    pdfObject = open(filename, "rb")
-    pdfReader = PdfReader(pdfObject)
     text_lines = []
-    for pageObject in pdfReader.pages:
-        page = pageObject.extract_text()
-        text_lines.extend(page.split("\n"))
-    # TODO: clean up special characters, add spaces where necessary
+    with open(filename, "rb") as pdf_object:
+        pdf_reader = PdfReader(pdf_object)
+        for page_object in pdf_reader.pages:
+            page = page_object.extract_text()
+            text_lines.extend(page.split("\n"))
     return text_lines
 
 
 def get_raw_text_lines_mupdf(filename: str) -> List[str]:
     doc = fitz.open(filename)
     text_lines = []
-    for pageObject in doc:
-        page = pageObject.get_text()  # .encode("utf8")
+    for page_object in doc:
+        page = page_object.get_text()  # .encode("utf8")
         text_lines.extend(page.split("\n"))
     return text_lines
 
@@ -234,7 +237,7 @@ def roll_up_rbc_bank_transactions(text_lines: List[str]) -> List[str]:
                     appendit = (
                         "\t".join(utils.trim_parts(parts))
                         + "\t"
-                        + "{:,.2f}".format(initial_balance + partial_balance)
+                        + f"{(initial_balance + partial_balance):,.2f}"
                     )
                     roll_up_lines.append(appendit)
                     days_entries = []
@@ -275,6 +278,7 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
     previous_month = None
     date_range_string = None
     for text_line in text_lines:
+        text_line = text_line.strip()
         if text_line.startswith("STATEMENT FROM"):
             # RBC MC
             date_range_string = text_line.split("STATEMENT FROM ")[1]
@@ -288,10 +292,24 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
             end_month = end_datetime.month
             date_range_string = None
         text_line = text_line.replace("\t", " ")
-        if not in_rollup and (utils.is_two_part_date(text_line)):
+        # 2026+ pdfs produce two date lines sometimes
+        transaction_date = None
+        posted_date = None
+        two_date_list = text_line.split(" ")
+        if (
+            len(two_date_list) == 4
+            and utils.is_two_part_date(trans_date := " ".join(two_date_list[0:2]))
+            and utils.is_two_part_date(post_date := " ".join(two_date_list[2:]))
+        ):
+            transaction_date = trans_date
+            posted_date = post_date
+        if not in_rollup and (
+            utils.is_two_part_date(text_line) or (transaction_date and posted_date)
+        ):
             in_rollup = True
             field_number = 0
-            dd_mon = utils.normalize_to_dd_mon(text_line)
+            mon_dot_dd = transaction_date if transaction_date else text_line
+            dd_mon = utils.normalize_to_dd_mon(mon_dot_dd)
             entry_datetime = datetime.strptime(dd_mon, "%d %b")
             if previous_month and previous_month > entry_datetime.month:
                 year = year + 1
@@ -301,6 +319,8 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
                 year = end_year
             previous_month = entry_datetime.month
             roll_up = f"{dd_mon} {year}"
+            if posted_date:
+                field_number = 1
         elif in_rollup:
             field_number += 1
             if field_number == 1:
@@ -340,18 +360,18 @@ def roll_up_card_transactions(text_lines: List[str]) -> List[str]:
 
 
 def output_lines(transaction_lines: List[str], output: str) -> None:
-    with open(output, "w") as output_file:
+    with open(output, "w", encoding="utf8") as output_file:
         for line in transaction_lines:
             output_file.write(f"{line}\n")
 
 
 def process():
-    input, filetype, output, capture, input_format = get_run_params()
+    input_path, filetype, output, capture, input_format = get_run_params()
     transaction_lines = []
     if input_format == "pdf":
-        raw_text_lines = get_raw_text_lines_mupdf(input)
+        raw_text_lines = get_raw_text_lines_mupdf(input_path)
     else:
-        raw_text_lines = get_raw_text_lines_cap(input)
+        raw_text_lines = get_raw_text_lines_cap(input_path)
     if capture:
         output_lines(raw_text_lines, capture)
     if filetype == "bmo_bank":

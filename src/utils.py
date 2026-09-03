@@ -1,6 +1,6 @@
 from datetime import datetime
-from dateutil.parser import parse
 from typing import List
+from dateutil.parser import parse
 
 MAX_FIELD_LENGTH = 128
 
@@ -19,9 +19,9 @@ def is_date(string, fuzzy=False):
         return False
 
 
-def is_format_date(string, format):
+def is_format_date(string, format_string):
     try:
-        datetime.strptime(string, format)
+        datetime.strptime(string, format_string)
         return True
     except ValueError:
         return False
@@ -91,10 +91,7 @@ def is_transaction_line(string):
 def is_float(string):
     try:
         float(string)
-        if "." in string:
-            return True
-        else:
-            return False
+        return bool("." in string)
     except ValueError:
         return False
 

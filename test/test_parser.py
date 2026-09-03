@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
-from pdf2txt import (
+from src.pdf2txt import (
     roll_up_rbc_bank_transactions,
     roll_up_bmo_bank_transactions,
     roll_up_card_transactions,
@@ -258,7 +258,7 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "9,700.00", "9,900.00", "9,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
 
     def test_undated_rows_rbc_bank(self):
@@ -292,7 +292,7 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "9,700.00", "9,900.00", "9,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
 
     def test_skip_balance_rbc_bank(self):
@@ -325,8 +325,34 @@ class TestParser(unittest.TestCase):
             balances, ["Balance", "10,000.00", "10,300.00", "10,500.00", "11,200.00"]
         )
         self.assertFalse(
-            any([bool("ERR:BALANCE" in description) for description in descriptions])
+            any(bool("ERR:BALANCE" in description) for description in descriptions)
         )
+
+    def test_two_date_bmo_card(self):
+        date_lines = [
+            "Dec. 17, 2023 - Jan. 6, 2024",
+            "Dec. 17 Dec. 18",
+            "Membership",
+            "MyMembership",
+            "3298749847539874",
+            "100.00",
+            "Jan. 1 Jan. 3",
+            "Food Court",
+            "City",
+            "Province",
+            "9808938408093",
+            "30.00",
+            "Jan. 4 Jan. 6 ",
+            "GAS GAS GAS",
+            "100.00",
+        ]
+        result_lines = roll_up_card_transactions(date_lines)
+        start_year = (result_lines[1].split("\t")[0].split(" "))[2]
+        end_year = (result_lines[2].split("\t")[0].split(" "))[2]
+        continue_year = (result_lines[3].split("\t")[0].split(" "))[2]
+        self.assertEqual(start_year, "2023")
+        self.assertEqual(end_year, "2024")
+        self.assertEqual(continue_year, "2024")
 
 
 if __name__ == "__main__":

@@ -38,8 +38,7 @@ Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> an
 git clone git@github.com:jeremysquires/bankstate.git
 cd bankstate
 pipenv install --dev
-pipenv shell
-python pdf2txt.py filename.pdf <filetype> output.tsv
+pipenv python pdf2txt.py filename.pdf <filetype> output.tsv
 # Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
 ```
 
@@ -55,6 +54,31 @@ This file can be more easily examined than the PDF to determine whether the prob
 These captured exports can also be sanitized or anonymized to remove any personally identifiable information in case they need to be reproduced or debugged by someone other than the owner of the data.
 
 In order to test changes to the raw text itself, add the parameter `--format cap` and pass the path to the raw text capture file in as the input filename rather than a PDF.
+
+## payee_category.py
+
+The payee category tool adds payee and category columns to existing transations based upon regex pattern matching against the descriptions.
+
+It reads some CSVs from specific banks and the TSV format produced by `pdf2txt.py`.
+
+It writes a standard import CSV format file. Sample REGEX patterns are found in `payee_patterns.json` and `category_patterns.json`.
+
+### Payee Category Usage
+
+* Copy `payee_patterns.json` into `my_payee_patterns.json` and customize it for your needs
+* Copy `category_patterns.json` into `my_category_patterns.json` and customize it for your needs
+* Optionally place the customized config files into a folder other than the SCRIPTS folder and pass the path using `--config` option
+  * This is especially useful if working on the code, as the tests are based upon no customized configs
+
+```bash
+pipenv python payee_category.py filename <filetype> output.csv
+# Where: filetype = [ bmo_bank | sco_visa | tsv ]
+pipenv python payee_category.py filename <filetype> output.csv -b balance
+# Where: balance is the dollar value in the account before the first transaction
+pipenv python payee_category.py filename <filetype> output.csv -c path_to_configs
+# Where: path_to_configs is the path where the my_payee_patterns.json and my_category_patterns.json are found
+# (if not in the SCRIPTS folder along with the default configs)
+```
 
 ## Import Into Budgeting Software
 

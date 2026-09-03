@@ -9,18 +9,14 @@ The problem with this approach is that most descriptions that have payee informa
 All the following should be Payee: `MAGOO'S`, `ONLINESTORE CA`, `ONLINESTORE`, `SHOPNAME`, `OTHERSHOP`, `BOOKSTORE`
 
 ```text
-MAGOO'S #5079
-MAGOO'S #7135
+MAGOO'S #5079           CITY1 PROVINCE1
+MAGOO'S #7135           CITY2 PROVINCE2
 MAGOO'S #9617
 ONLINESTORE CA*JF88888 WWW.STORE.COM
 ONLINESTORE CA*B63AC99 WWW.STORE.COM
 ONLINESTORE 12345678 WWW.STORE.COM
-#930 SHOPNAME CITY1 PROVINCE1
-#920 SHOPNAME CITY2 PROVINCE2
-OUTER ROAD OTHERSHOP CITY1 PROVINCE1
-INNER ROAD OTHERSHOP CITY1 PROVINCE1
-BOOKSTORE 123 CITY1
-BOOKSTORE 999 CITY2
+BOOKSTORE 123           CITY1
+BOOKSTORE 999           CITY2
 etc.
 ```
 
@@ -30,6 +26,15 @@ All the following should not include the category of transaction prefix in the P
 INTERAC e-Transfer Sent Neighborhood Lawn Care
 Online Bill Payment, POWER COMPANY
 Direct Deposit, JOB INC. PAY/PAY
+```
+
+There are some patterns that can't be made generic, so these may need specific rules per payee. 
+
+```text
+OUTER ROAD OTHERSHOP           CITY1 PROVINCE1
+INNER ROAD OTHERSHOP           CITY1 PROVINCE1
+#930 SHOPNAME           CITY1 PROVINCE1
+#920 SHOPNAME           CITY2 PROVINCE2
 ```
 
 ## Plan

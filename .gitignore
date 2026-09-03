@@ -1,5 +1,7 @@
 # pii test data
 test/data
+my_category_patterns.json
+my_payee_patterns.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

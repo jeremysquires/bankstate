@@ -66,4 +66,19 @@ pipenv run python pdf2txt.py ../test/data/raw/bmo_bank.txt bmo_bank ../test/data
 cd ../test/data
 diff orig new
 
+# check processing payee categories
+cd ../../src
+pipenv run python payee_category.py ../test/data/new/bmo_bank.tsv tsv ../test/data/new/bmo_bank.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/bmo_card.tsv tsv ../test/data/new/bmo_card.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/bmo_card2.tsv tsv ../test/data/new/bmo_card2.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_bank.tsv tsv ../test/data/new/rbc_bank.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_bank2.tsv tsv ../test/data/new/rbc_bank2.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_bank_2023.tsv tsv ../test/data/new/rbc_bank_2023.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_bank_2025.tsv tsv ../test/data/new/rbc_bank_2025.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_card.tsv tsv ../test/data/new/rbc_card.tsv.merge.csv -c ../test/data/configs
+pipenv run python payee_category.py ../test/data/new/rbc_card_2026.tsv tsv ../test/data/new/rbc_card_2026.tsv.merge.csv -c ../test/data/configs
+cd ../test/data
+diff orig new
+
+
 cd $CWD
