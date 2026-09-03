@@ -12,8 +12,10 @@ import locale
 
 SCRIPT_DIR = pathlib.Path(__file__).parent.resolve()
 TWOPLACES = Decimal(10) ** -2
+CONFIG = None
 
-def get_run_params() -> Tuple[str, str, str]:
+
+def get_run_params() -> dict[str, str]:
     parser = argparse.ArgumentParser(
         prog="payee_category.py",
         description="Converts bank statement TSV/CSVs to a common format and adds payees and categories",
@@ -45,11 +47,16 @@ def get_run_params() -> Tuple[str, str, str]:
         "--balance",
         "-b",
         help=(f"balance before first transaction"),
-        default=None,
+        default="",
+    )
+    parser.add_argument(
+        "--config",
+        "-c",
+        help=(f"path to configuration files"),
+        default="",
     )
     args = parser.parse_args()
-    print(args.input, args.filetype, args.output, args.balance or "")
-    return args.input, args.filetype, args.output, args.balance or ""
+    return args
 
 
 def get_csv(filename: str) -> List[str]:
@@ -67,8 +74,8 @@ def get_csv(filename: str) -> List[str]:
 @cache
 def get_category_patterns() -> dict[str, str]:
     # regex matches for specific category patterns
-    if os.path.exists(f"{SCRIPT_DIR}/my_category_patterns.json"):
-        with open(f"{SCRIPT_DIR}/my_category_patterns.json", "r") as file:
+    if os.path.exists(f"{CONFIG}/my_category_patterns.json"):
+        with open(f"{CONFIG}/my_category_patterns.json", "r") as file:
             return json.load(file)
     elif os.path.exists(f"{SCRIPT_DIR}/category_patterns.json"):
         with open(f"{SCRIPT_DIR}/category_patterns.json", "r") as file:
@@ -79,8 +86,8 @@ def get_category_patterns() -> dict[str, str]:
 @cache
 def get_payee_patterns() -> list[str]:
     # regex matches for specific payee patterns
-    if os.path.exists(f"{SCRIPT_DIR}/my_payee_patterns.json"):
-        with open(f"{SCRIPT_DIR}/my_payee_patterns.json", "r") as file:
+    if os.path.exists(f"{CONFIG}/my_payee_patterns.json"):
+        with open(f"{CONFIG}/my_payee_patterns.json", "r") as file:
             return json.load(file)
     elif os.path.exists(f"{SCRIPT_DIR}/payee_patterns.json"):
         with open(f"{SCRIPT_DIR}/payee_patterns.json", "r") as file:
@@ -121,8 +128,8 @@ def fields_to_row(
     description: str,
     withdrawal: Union[Decimal, str],
     deposit: Union[Decimal, str],
-    balance: Union[Decimal, str]
-    ) -> List[str]:
+    balance: Union[Decimal, str],
+) -> List[str]:
     return [
         dateposted,
         description,
@@ -149,15 +156,21 @@ def map_bmo_bank_transactions(rows: List[List[str]], balance: str) -> List[List[
             row[header_to_indexes["Date Posted"]], "%Y%m%d"
         ).strftime("%d %b %Y")
         description = p.sub("", row[header_to_indexes["Description"]])
-        amount = Decimal(locale.atof(row[header_to_indexes["Transaction Amount"]])).quantize(TWOPLACES)
+        amount = Decimal(
+            locale.atof(row[header_to_indexes["Transaction Amount"]])
+        ).quantize(TWOPLACES)
         deposit = amount if amount >= 0.0 else ""
         withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
         balance = balance + amount if balance else ""
-        roll_up_rows.append(fields_to_row(dateposted, description, withdrawal, deposit, balance))
+        roll_up_rows.append(
+            fields_to_row(dateposted, description, withdrawal, deposit, balance)
+        )
     return roll_up_rows
 
 
-def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[List[str]]:
+def map_scotia_visa_transactions(
+    rows: List[List[str]], balance: str
+) -> List[List[str]]:
     # "Filter", Date, Description, "Sub-description", Status, "Type of Transaction", Amount
     header_to_indexes = map_header_to_indexes(rows[0])
     if balance:
@@ -170,7 +183,9 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
             row[header_to_indexes["Date"]], "%Y-%m-%d"
         ).strftime("%d %b %Y")
         description = row[header_to_indexes["Description"]]
-        amount = Decimal(locale.atof(row[header_to_indexes["Amount"]])).quantize(TWOPLACES)
+        amount = Decimal(locale.atof(row[header_to_indexes["Amount"]])).quantize(
+            TWOPLACES
+        )
         transaction_type = row[header_to_indexes["Type of Transaction"]]
         # check for visarro world where debits are positive and credits are negative
         if amount <= 0.0 and transaction_type.lower() == "credit":
@@ -180,7 +195,9 @@ def map_scotia_visa_transactions(rows: List[List[str]], balance: str) -> List[Li
         deposit = amount if amount >= 0.0 else ""
         withdrawal = Decimal("-1.00") * amount if amount < 0.0 else ""
         balance = balance + amount if balance else ""
-        roll_up_rows.append(fields_to_row(dateposted, description, withdrawal, deposit, balance))
+        roll_up_rows.append(
+            fields_to_row(dateposted, description, withdrawal, deposit, balance)
+        )
     return roll_up_rows
 
 
@@ -201,7 +218,11 @@ def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
         row[2] = str(withdrawal)
         deposit = Decimal(locale.atof(row[3])).quantize(TWOPLACES) if row[3] else ""
         row[3] = str(deposit)
-        balance = Decimal(locale.atof(row[4])).quantize(TWOPLACES) if len(row) >= 5 and row[4] else ""
+        balance = (
+            Decimal(locale.atof(row[4])).quantize(TWOPLACES)
+            if len(row) >= 5 and row[4]
+            else ""
+        )
         if not calculated_balance:
             # assume the first row's balance is ok or not present ("")
             calculated_balance = balance
@@ -216,14 +237,20 @@ def map_tsv_transactions(rows: List[List[str]]) -> List[List[str]]:
 
 
 def output_rows(rows: List[List[str]], output: str) -> None:
-    with open(output, mode="w", newline='\n') as file:
+    with open(output, mode="w", newline="\n") as file:
         writer = csv.writer(file)
         writer.writerows(rows)
 
 
 def process():
-    locale.setlocale(locale.LC_NUMERIC, '')
-    input, filetype, output, balance = get_run_params()
+    global CONFIG
+    locale.setlocale(locale.LC_NUMERIC, "")
+    args = get_run_params()
+    input = args.input
+    filetype = args.filetype
+    output = args.output
+    balance = args.balance or ""
+    CONFIG = args.config or SCRIPT_DIR
     rows = get_csv(input)
     mapped_rows = []
     if filetype == "bmo_bank":

@@ -67,10 +67,17 @@ It writes a standard import CSV format file. Sample REGEX patterns are found in 
 
 * Copy `payee_patterns.json` into `my_payee_patterns.json` and customize it for your needs
 * Copy `category_patterns.json` into `my_category_patterns.json` and customize it for your needs
+* Optionally place the customized config files into a folder other than the SCRIPTS folder and pass the path using `--config` option
+  * This is especially useful if working on the code, as the tests are based upon no customized configs
 
 ```bash
 pipenv python payee_category.py filename <filetype> output.csv
 # Where: filetype = [ bmo_bank | sco_visa | tsv ]
+pipenv python payee_category.py filename <filetype> output.csv -b balance
+# Where: balance is the dollar value in the account before the first transaction
+pipenv python payee_category.py filename <filetype> output.csv -c path_to_configs
+# Where: path_to_configs is the path where the my_payee_patterns.json and my_category_patterns.json are found
+# (if not in the SCRIPTS folder along with the default configs)
 ```
 
 ## Import Into Budgeting Software
