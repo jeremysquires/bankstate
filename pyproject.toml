@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pypdf>=3.5.0",
     "python-dateutil>=2.8.2",
-    "pymupdf>=1.21.1",
+    "pymupdf>=1.28.2",
 ]
 
 [dependency-groups]
