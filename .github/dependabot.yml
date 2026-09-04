@@ -15,13 +15,3 @@ updates:
     allow:
       - dependency-type: "production"
     open-pull-requests-limit: 60
-  - package-ecosystem: "pip"
-    directory: "/ecs"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "02:00"
-      timezone: "America/Edmonton"
-    allow:
-      - dependency-type: "production"
-    open-pull-requests-limit: 60
