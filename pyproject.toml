@@ -1,0 +1,36 @@
+[project]
+name = "bankstate"
+version = "0.3.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pypdf>=3.5.0",
+    "python-dateutil>=2.8.2",
+    "pymupdf>=1.21.1",
+]
+
+[dependency-groups]
+dev = [
+    "black",
+    "pylint",
+]
+
+[tool.uv]
+package = false
+default-groups = "all"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+[build-system]
+requires = ["uv_build>=0.12.0,<0.13"]
+build-backend = "uv_build"
+
+[tool.uvtask.run-script]
+format = "uv run black src/*.py test/*.py"
+lint = "uv run pylint ./src ./test"
+test = "uv run python -m unittest discover -s test -v"
+test_handlers = "uv run bash ./test/test_handlers.sh"
+check = ["lint", "test"]
+install = { command = "uv sync --no-dev", description = "Install dependencies as specified in lockfile, excluding dev dependencies" }
+dev-install = { command = "uv sync --dev --all-extras", description = "Install all dependencies including dev and extras" }
