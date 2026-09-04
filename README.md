@@ -25,25 +25,29 @@ The stmt2csv.py script has been removed, but there is an option to import raw te
 
 Generated CSV files follow the CSV RFC: <https://tools.ietf.org/html/rfc4180> and contain columns that in general match the input files, but with some cleanups to make import easier. Generated TSV files replace commas for tabs, which is useful when fields often contain commas.
 
-## pdf2txt.py
+## Requirements
 
-### Requirements
+* Python 3.9 (managed through pyenv or uv)
+* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+  * previously used pipenv and pyenv, but uv provides functionality covering both tools, and is faster
+  * [uvtask](https://pypi.org/project/uvtask/) provides the missing uv functionality of a task runner
 
-* Python 3.9
-* pipenv
-
-### Process
+## Quick Start
 
 ```bash
 git clone git@github.com:jeremysquires/bankstate.git
 cd bankstate
-pipenv install --dev
-pipenv python pdf2txt.py filename.pdf <filetype> output.tsv
+uv venv
+uv sync --dev
+uv run python pdf2txt.py filename.pdf <filetype> output.tsv
 # Where: filetype = [ bmo_bank | bmo_card | rbc_bank | rbc_card ]
+uv run python payee_category.py output.tsv tsv output.csv
 ```
 
-* Open TSV in LibreOffice/Excel to verify it has the correct structure
+* Open output.csv in LibreOffice/Excel to verify it has the correct structure
 * Import Into Budgeting Software
+
+## pdf2txt.py
 
 ### Capture Export Text for Debug
 
@@ -71,11 +75,11 @@ It writes a standard import CSV format file. Sample REGEX patterns are found in 
   * This is especially useful if working on the code, as the tests are based upon no customized configs
 
 ```bash
-pipenv python payee_category.py filename <filetype> output.csv
+uv run python payee_category.py filename <filetype> output.csv
 # Where: filetype = [ bmo_bank | sco_visa | tsv ]
-pipenv python payee_category.py filename <filetype> output.csv -b balance
+uv run python payee_category.py filename <filetype> output.csv -b balance
 # Where: balance is the dollar value in the account before the first transaction
-pipenv python payee_category.py filename <filetype> output.csv -c path_to_configs
+uv run python payee_category.py filename <filetype> output.csv -c path_to_configs
 # Where: path_to_configs is the path where the my_payee_patterns.json and my_category_patterns.json are found
 # (if not in the SCRIPTS folder along with the default configs)
 ```
@@ -117,9 +121,9 @@ For HomeBank users:
 
 ## Tests
 
-* There are unit tests for the utils that can be run with `pipenv run test`.
+* There are unit tests for the utils that can be run with `uvx uvtask test`.
 * Testing the handlers requires some PDF data samples.
-* Once the PDF Data Samples are set up, you can run `pipenv run test_handlers`.
+* Once the PDF Data Samples are set up, you can run `uvx uvtask test_handlers`.
 * See the `test/test_handlers.sh` script for the list of tests available under the `scripts` section.
 
 ### PDF Data Samples
